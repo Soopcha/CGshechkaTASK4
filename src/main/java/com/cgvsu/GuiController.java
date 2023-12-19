@@ -64,7 +64,7 @@ public class GuiController {
         timeline.getKeyFrames().add(frame);
         timeline.play();
     }
-//дописали гадость  throws IncorrectFileException ес чё делит
+    //дописали гадость  throws IncorrectFileException ес чё делит
     @FXML
     private void onOpenModelMenuItemClick() throws IncorrectFileException {
         FileChooser fileChooser = new FileChooser();
