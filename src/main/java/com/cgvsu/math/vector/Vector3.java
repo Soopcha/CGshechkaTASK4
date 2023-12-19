@@ -1,6 +1,7 @@
 package com.cgvsu.math.vector;
 
 import java.util.List;
+import java.util.Objects;
 
 public class Vector3 {
     private double x;
@@ -100,10 +101,10 @@ public class Vector3 {
     }
 
 
-
+    //дописала по коду Артема п
     public void cross(Vector3 v1, Vector3 v2) {
         if (v1 == null || v2 == null) {
-            throw new IllegalArgumentException("Vector3f can not be null");
+            throw new IllegalArgumentException("Vector can not be null");
         }
 
         double x = v1.y * v2.z - v1.z * v2.y;
@@ -128,4 +129,31 @@ public class Vector3 {
 
         return result;
     }
+
+    //дописала по коду Артема п 3 метода
+    @Override
+    public int hashCode() {
+        return Objects.hash(x, y, z);
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Vector3 vector3 = (Vector3) o;
+        return Double.compare(vector3.x, x) == 0 &&
+                Double.compare(vector3.y, y) == 0 &&
+                Double.compare(vector3.z, z) == 0;
+    }
+
+    @Override
+    public String toString() {
+        return "Vector3{" +
+                "x=" + x +
+                ", y=" + y +
+                ", z=" + z +
+                '}';
+    }
+
 }

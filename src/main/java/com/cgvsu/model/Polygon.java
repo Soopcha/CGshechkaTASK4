@@ -60,4 +60,30 @@ public class Polygon {
     public int hashCode() {
         return Objects.hash(vertexIndices, textureVertexIndices, normalIndices);
     }
+
+   //дописала по коду Артема п
+   @Override
+    public String toString() {
+        StringBuilder string = new StringBuilder("f ");
+
+        for (int index = 0; index < vertexIndices.size(); index++) {
+            string.append(vertexIndices.get(index));
+
+            if (textureVertexIndices.size() != 0 || normalIndices.size() != 0) {
+                string.append("/");
+                if (textureVertexIndices.size() != 0) {
+                    string.append(textureVertexIndices.get(index));
+                }
+
+                if (normalIndices.size() != 0) {
+                    string.append("/");
+                    string.append(normalIndices.get(index));
+                }
+            }
+
+            string.append(" ");
+        }
+
+        return string.toString();
+    }
 }

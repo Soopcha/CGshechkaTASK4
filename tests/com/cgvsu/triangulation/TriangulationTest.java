@@ -238,6 +238,7 @@ class TriangulationTest {
 
         Model model = new Model();
 
+
         model.vertices.add(new Vector3(0, 0, 0));
         model.vertices.add(new Vector3(1, 0, 0));
         model.vertices.add(new Vector3(1, 1, 0));
@@ -270,7 +271,7 @@ class TriangulationTest {
 
         Triangulation.recalculateNormals(model);
 
-        Vector3 expectedResult1 = new Vector3(1.0 / 3.0, -1.0 / 3.0, 1.0 / 3.0);
+        Vector3 expectedResult1 = new Vector3(1.0 / 3.0, -1 / 3.0, 1 / 3.0);
         Vector3 expectedResult2 = new Vector3(1.0 / 3.0, -1.0 / 3.0, 1.0 / 3.0);
         Vector3 expectedResult3 = new Vector3(1.0 / 3.0, 1.0 / 3.0, 2.0 / 3.0);
         Vector3 expectedResult4 = new Vector3(1.0 / 3.0, 1.0 / 3.0, 2.0 / 3.0);
@@ -278,14 +279,22 @@ class TriangulationTest {
         Vector3 expectedResult6 = new Vector3(1.0 / 3.0, 0.0, 1.0 / 3.0);
 
         ArrayList<Vector3> expectedResult = new ArrayList<>(Arrays.asList(expectedResult1, expectedResult2, expectedResult3, expectedResult4, expectedResult5, expectedResult6));
-
         for (int i = 0; i < model.normals.size(); i++) {
+            Assertions.assertEquals(expectedResult.get(i), model.normals.get(i));
+        }
+
+        /* for (int i = 0; i < model.normals.size(); i++) {
             Vector3 expected = expectedResult.get(i);
             Vector3 result = model.normals.get(i);
+
+            System.out.println("Calculated Normal: " + result.getX() + " " + result.getY()+ " " + result.getZ());
 
             Assertions.assertEquals(expected.getX(), result.getX(), 0.01);
             Assertions.assertEquals(expected.getY(), result.getY(), 0.01);
             Assertions.assertEquals(expected.getZ(), result.getZ(), 0.01);
         }
+
+         */
     }
+
 }
