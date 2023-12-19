@@ -1,104 +1,93 @@
 package com.cgvsu.objwriter;
 
-import com.cgvsu.math.Vector2f;
-import com.cgvsu.math.Vector3f;
+import com.cgvsu.math.vector.Vector2;
+import com.cgvsu.math.vector.Vector3;
 import com.cgvsu.model.Model;
 import com.cgvsu.model.Polygon;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
+import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public class ObjWriter {
-
+    private static final String OBJ_VERTEX_TOKEN = "v";
+    private static final String OBJ_TEXTURE_TOKEN = "vt";
+    private static final String OBJ_NORMAL_TOKEN = "vn";
+    private static final String OBJ_FACE_TOKEN = "f";
     public static void write(String fileName, Model model) {
+        if (model == null || model.isEmpty()) {
+            throw new IllegalArgumentException("Invalid model for writing");
+        }
+
         File file = new File(fileName);
 
         try {
             if (file.createNewFile()) {
-                System.out.println("Файл успешно создан: " + file.getName());
-            } else {
-                System.out.println("Файл уже существует.");
+                System.out.println("File created");
             }
         } catch (IOException e) {
-            throw new ObjWriterException(e.getMessage());
+            throw new ObjWriterException("Error creating the file: " + fileName + " " + e.getMessage());
         }
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
-            writeVertices(writer, model.vertices);
-            writeTextureVertices(writer, model.textureVertices);
-            writeNormals(writer, model.normals);
-            writePolygons(writer, model.polygons);
+        try (PrintWriter printWriter = new PrintWriter(file)) {
+            writeVertices(printWriter, model.getVertices());
+            writeTextureVertices(printWriter, model.getTextureVertices());
+            writeNormals(printWriter, model.getNormals());
+            writePolygons(printWriter, model.getPolygons());
         } catch (IOException e) {
-            throw new ObjWriterException(e.getMessage());
+            throw new ObjWriterException("Error writing to file: " + fileName + " " + e.getMessage());
         }
     }
-
-
-    private static void writeVertices(BufferedWriter writer, List<Vector3f> vertices) throws IOException {
-        DecimalFormatSymbols customSymbols = new DecimalFormatSymbols(Locale.US);
-        customSymbols.setDecimalSeparator('.');
-        DecimalFormat decimalFormat = new DecimalFormat("0.######", customSymbols);
-
-        for (Vector3f vertex : vertices) {
-            writer.write("v " + decimalFormat.format(vertex.x) + " " + decimalFormat.format(vertex.y) + " " + decimalFormat.format(vertex.z));
-            writer.newLine();
+    protected static void writeVertices(PrintWriter pw, List<Vector3> vertices) throws IOException {
+        for (Vector3 vertex: vertices) {
+            pw.println(OBJ_VERTEX_TOKEN + " " + vertex.getX() + " " + vertex.getY() + " " + vertex.getZ());
         }
+        pw.println();
     }
 
-    private static void writeTextureVertices(BufferedWriter writer, List<Vector2f> textureVertices) throws IOException {
-        DecimalFormatSymbols customSymbols = new DecimalFormatSymbols(Locale.US);
-        customSymbols.setDecimalSeparator('.');
-        DecimalFormat decimalFormat = new DecimalFormat("0.######", customSymbols);
-
-        for (Vector2f textureVertex : textureVertices) {
-            writer.write("vt " + decimalFormat.format(textureVertex.x) + " " + decimalFormat.format(textureVertex.y));
-            writer.newLine();
+    protected static void writeTextureVertices(PrintWriter pw, List<Vector2> textureVertices) throws IOException {
+        for (Vector2 vertex: textureVertices) {
+            pw.println(OBJ_TEXTURE_TOKEN + " " + vertex.getX() + " " + vertex.getY());
         }
+        pw.println();
     }
 
-    private static void writeNormals(BufferedWriter writer, List<Vector3f> normals) throws IOException {
-        DecimalFormatSymbols customSymbols = new DecimalFormatSymbols(Locale.US);
-        customSymbols.setDecimalSeparator('.');
-        DecimalFormat decimalFormat = new DecimalFormat("0.######", customSymbols);
-
-        for (Vector3f normal : normals) {
-            writer.write("vn " + decimalFormat.format(normal.x) + " " + decimalFormat.format(normal.y) + " " + decimalFormat.format(normal.z));
-            writer.newLine();
+    protected static void writeNormals(PrintWriter pw, List<Vector3> normals) throws IOException {
+        for (Vector3 normal: normals) {
+            pw.println(OBJ_NORMAL_TOKEN + " " + normal.getX() + " " + normal.getY() + " " + normal.getZ());
         }
+        pw.println();
     }
-    private static void writePolygons(BufferedWriter writer, List<Polygon> polygons) throws IOException {
+
+    protected static void writePolygons(PrintWriter pw, List<Polygon> polygons) throws IOException {
         for (Polygon polygon : polygons) {
-            writer.write("f ");
-            List<Integer> vertexIndices = polygon.getVertexIndices();
-            List<Integer> textureVertexIndices = polygon.getTextureVertexIndices();
-            List<Integer> normalIndices = polygon.getNormalIndices();
+            ArrayList<Integer> vertexIndices = polygon.getVertexIndices();
+            ArrayList<Integer> textureVertexIndices = polygon.getTextureVertexIndices();
+            ArrayList<Integer> normalIndices = polygon.getNormalIndices();
 
-            for (int i = 0; i < vertexIndices.size(); i++) {
-                if(!textureVertexIndices.isEmpty()){
-                writer.write(vertexIndices.get(i) + 1 + "/" + (textureVertexIndices.get(i) + 1));
-                }
-                else{
-                    writer.write(String.valueOf(vertexIndices.get(i) + 1));
-                }
-                if (!normalIndices.isEmpty()) {
-                    if(textureVertexIndices.isEmpty()){
-                        writer.write("/");
-                    }
-                    writer.write("/" + (normalIndices.get(i) + 1));
-                }
-                writer.write(" ");
-            }
-            writer.newLine();
-
+            pw.print(polygonToObjString(vertexIndices, textureVertexIndices, normalIndices));
+            pw.println();
+        }
     }
 
-
-
-
-}}
+    private static String polygonToObjString(List<Integer> vertexIndices, List<Integer> textureVertexIndices, List<Integer> normalIndices) {
+        StringBuilder objString = new StringBuilder(OBJ_FACE_TOKEN + " ");
+        for (int i = 0; i < vertexIndices.size(); i++) {
+            if (!textureVertexIndices.isEmpty()) {
+                objString.append(vertexIndices.get(i) + 1).append("/").append(textureVertexIndices.get(i) + 1);
+            } else {
+                objString.append(vertexIndices.get(i) + 1);
+            }
+            if (!normalIndices.isEmpty()) {
+                if (textureVertexIndices.isEmpty()) {
+                    objString.append("/");
+                }
+                objString.append("/").append(normalIndices.get(i) + 1);
+            }
+            objString.append(" ");
+        }
+        return objString.toString();
+    }
+}
