@@ -1,9 +1,14 @@
 package com.cgvsu.math.vector;
 
+import java.util.List;
+
 public class Vector3 {
     private double x;
     private double y;
     private double z;
+
+    public Vector3() {
+    }
 
     public Vector3(double x, double y, double z) {
         this.x = x;
@@ -72,7 +77,7 @@ public class Vector3 {
 
     // Вычисление длины вектора
     public double length() {
-        return Math.sqrt(x*x + y*y + z*z);
+        return Math.sqrt(x * x + y*y + z*z);
     }
 
     // Нормализация вектора
@@ -92,5 +97,35 @@ public class Vector3 {
         double newY = this.z * other.x - this.x * other.z;
         double newZ = this.x * other.y - this.y * other.x;
         return new Vector3(newX, newY, newZ);
+    }
+
+
+
+    public void cross(Vector3 v1, Vector3 v2) {
+        if (v1 == null || v2 == null) {
+            throw new IllegalArgumentException("Vector3f can not be null");
+        }
+
+        double x = v1.y * v2.z - v1.z * v2.y;
+        double y = v2.x * v1.z - v2.z * v1.x;
+
+        this.z = v1.x * v2.y - v1.y * v2.x;
+        this.x = x;
+        this.y = y;
+    }
+
+
+    public static Vector3 fromTwoPoints(Vector3 vertex1, Vector3 vertex2) {
+        return new Vector3(vertex2.x - vertex1.x,
+                vertex2.y - vertex1.y,
+                vertex2.z - vertex1.z);
+    }
+
+    public static Vector3 sum(List<Vector3> vectors) {
+        final var result = new Vector3();
+
+        vectors.forEach(result::add);
+
+        return result;
     }
 }
