@@ -11,11 +11,19 @@
     <MenuBar>
         <Menu mnemonicParsing="false" text="File">
             <MenuItem mnemonicParsing="false" onAction="#onOpenModelMenuItemClick" text="Load Model">
-            <accelerator>
-                <KeyCodeCombination alt="UP" control="DOWN" meta="UP" shift="UP" shortcut="UP" code="F"/>
-            </accelerator>
+                <accelerator>
+                    <KeyCodeCombination alt="UP" control="DOWN" meta="UP" shift="UP" shortcut="UP" code="F"/>
+                </accelerator>
             </MenuItem>
         </Menu>
+        <Menu mnemonicParsing="false" text="Сохранить">
+            <MenuItem mnemonicParsing="false" onAction="#onSaveModelMenuItemClick" text="Save Model">
+                <accelerator>
+                    <KeyCodeCombination alt="DOWN" control="DOWN" meta="DOWN" shift="DOWN" shortcut="DOWN" code="S"/>
+                </accelerator>
+            </MenuItem>
+        </Menu>
+
         <Menu mnemonicParsing="false" text="Camera Options">
             <MenuItem mnemonicParsing="false" onAction="#handleCameraForward" text="Forward">
                 <accelerator>

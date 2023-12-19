@@ -17,6 +17,7 @@ import java.nio.file.Path;
 import java.io.IOException;
 import java.io.File;
 import javax.vecmath.Vector3f;
+import com.cgvsu.objwriter.ObjWriter;
 
 import com.cgvsu.model.Model;
 import com.cgvsu.objreader.ObjReader;
@@ -85,6 +86,21 @@ public class GuiController {
         } catch (IOException exception) {
 
         }
+    }
+
+    @FXML
+    private void onSaveModelMenuItemClick() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Model (*.obj)", "*.obj"));
+        fileChooser.setTitle("Save Model");
+
+        File file = fileChooser.showSaveDialog((Stage) canvas.getScene().getWindow());
+        if (file == null) {
+            return;
+        }
+
+        String fileName = file.getAbsolutePath();
+        ObjWriter.write(fileName, mesh);
     }
 
     @FXML
