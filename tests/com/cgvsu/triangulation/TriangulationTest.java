@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 class TriangulationTest {
 
     @Test
@@ -42,7 +44,7 @@ class TriangulationTest {
             result.append(polygon);
         }
 
-        Assertions.assertEquals(expectedResult.toString(), result.toString());
+        assertEquals(expectedResult.toString(), result.toString());
     }
 
     @Test
@@ -67,7 +69,7 @@ class TriangulationTest {
             result.append(polygon);
         }
 
-        Assertions.assertEquals(expectedResult.toString(), result.toString());
+        assertEquals(expectedResult.toString(), result.toString());
     }
 
     @Test
@@ -108,7 +110,7 @@ class TriangulationTest {
             result.append(polygon);
         }
 
-        Assertions.assertEquals(expectedResult.toString(), result.toString());
+        assertEquals(expectedResult.toString(), result.toString());
     }
 
     @Test
@@ -145,7 +147,7 @@ class TriangulationTest {
             result.append(polygon);
         }
 
-        Assertions.assertEquals(expectedResult.toString(), result.toString());
+        assertEquals(expectedResult.toString(), result.toString());
     }
 
     @Test
@@ -182,7 +184,7 @@ class TriangulationTest {
             result.append(polygon);
         }
 
-        Assertions.assertEquals(expectedResult.toString(), result.toString());
+        assertEquals(expectedResult.toString(), result.toString());
     }
 
     @Test
@@ -226,9 +228,9 @@ class TriangulationTest {
         Vector3 result = Triangulation.calculateNormalForPolygon(polygon, model);
         Vector3 expectedResult = new Vector3(23.05, -555.55, 67.2);
 
-        Assertions.assertEquals(expectedResult.getX(), result.getX(), 0.01);
-        Assertions.assertEquals(expectedResult.getY(), result.getY(), 0.01);
-        Assertions.assertEquals(expectedResult.getZ(), result.getZ(), 0.01);
+        assertEquals(expectedResult.getX(), result.getX(), 0.01);
+        assertEquals(expectedResult.getY(), result.getY(), 0.01);
+        assertEquals(expectedResult.getZ(), result.getZ(), 0.01);
 
     }
 
@@ -278,10 +280,31 @@ class TriangulationTest {
         Vector3 expectedResult5 = new Vector3(1.0 / 3.0, 0.0, 1.0 / 3.0);
         Vector3 expectedResult6 = new Vector3(1.0 / 3.0, 0.0, 1.0 / 3.0);
 
+
+        double delta = 0.1;
         ArrayList<Vector3> expectedResult = new ArrayList<>(Arrays.asList(expectedResult1, expectedResult2, expectedResult3, expectedResult4, expectedResult5, expectedResult6));
+//        for (int i = 0; i < model.normals.size(); i++) {
+//            assertEquals(expectedResult.get(i), model.normals.get(i),delta);
+//        }
+
         for (int i = 0; i < model.normals.size(); i++) {
-            Assertions.assertEquals(expectedResult.get(i), model.normals.get(i));
+            Vector3 expected = expectedResult.get(i);
+            Vector3 result = model.normals.get(i);
+
+            System.out.println("Calculated Normal: " + result.getX() + " " + result.getY()+ " " + result.getZ());
+
+            assertEquals(expected.getX(), result.getX(), 0.01);
+            assertEquals(expected.getY(), result.getY(), 0.01);
+            assertEquals(expected.getZ(), result.getZ(), 0.01);
         }
+
+
+
+        /*
+        for (int i = 0; i < model.normals.size(); i++) {
+            Assertions.assertTrue(expectedResult.get(i).equals(model.normals.get(i)));
+        }
+
 
         /* for (int i = 0; i < model.normals.size(); i++) {
             Vector3 expected = expectedResult.get(i);

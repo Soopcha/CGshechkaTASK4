@@ -123,11 +123,21 @@ public class Vector3 {
     }
 
     public static Vector3 sum(List<Vector3> vectors) {
-        final var result = new Vector3();
+        if (vectors == null || vectors.isEmpty()) {
+            throw new IllegalArgumentException("List of vectors is null or empty");
+        }
 
-        vectors.forEach(result::add);
+        double sumX = 0.0;
+        double sumY = 0.0;
+        double sumZ = 0.0;
 
-        return result;
+        for (Vector3 vector : vectors) {
+            sumX += vector.getX();
+            sumY += vector.getY();
+            sumZ += vector.getZ();
+        }
+
+        return new Vector3(sumX, sumY, sumZ);
     }
 
     //дописала по коду Артема п 3 метода
@@ -137,15 +147,29 @@ public class Vector3 {
     }
 
 
+    /* @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Vector3 vector3 = (Vector3) o;
+        return Double.compare(vector3.getX(), x) == 0 &&
+                Double.compare(vector3.getY(), y) == 0 &&
+                Double.compare(vector3.getZ(), z) == 0;
+    }
+
+     */
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Vector3 vector3 = (Vector3) o;
-        return Double.compare(vector3.x, x) == 0 &&
-                Double.compare(vector3.y, y) == 0 &&
-                Double.compare(vector3.z, z) == 0;
+        return Math.abs(vector3.getX() - x) < EPSILON &&
+                Math.abs(vector3.getY() - y) < EPSILON &&
+                Math.abs(vector3.getZ() - z) < EPSILON;
     }
+
+    private static final double EPSILON = 1e-10;  // или любое другое подходящее значение погрешности
 
     @Override
     public String toString() {

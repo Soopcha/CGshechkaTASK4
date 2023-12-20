@@ -9,7 +9,7 @@ public class Model {
 
     public ArrayList<Vector3> vertices = new ArrayList<Vector3>();
     public ArrayList<Vector2> textureVertices = new ArrayList<Vector2>();
-    public ArrayList<Vector3> normals = new ArrayList<Vector3>();
+    public ArrayList<Vector3> normals = new ArrayList<>();
     public ArrayList<Polygon> polygons = new ArrayList<Polygon>();
 
     public Model(ArrayList<Vector3> vertices, ArrayList<Vector2> textureVertices, ArrayList<Vector3> normals, ArrayList<Polygon> polygons) {

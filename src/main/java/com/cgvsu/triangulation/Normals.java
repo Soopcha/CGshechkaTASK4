@@ -21,6 +21,9 @@ public class Normals {
         return normals.size();
     }
 
+
+
+
     private ArrayList<Vector3> makeNormals(Model model) {
         for (Polygon polygon : model.polygons) {
             ArrayList<Integer> vertexIndices = polygon.getVertexIndices();
