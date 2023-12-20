@@ -6,6 +6,7 @@ public class Matrix4x4 {
     private double[][] matrix;
 
     public Matrix4x4() {
+
         matrix = new double[4][4];
     }
 
@@ -15,6 +16,30 @@ public class Matrix4x4 {
         }
         this.matrix = matrix;
     }
+    // добавила новый конструктор
+    public Matrix4x4(
+            double m00, double m01, double m02, double m03,
+            double m10, double m11, double m12, double m13,
+            double m20, double m21, double m22, double m23,
+            double m30, double m31, double m32, double m33) {
+        matrix = new double[][]{
+                {m00, m01, m02, m03},
+                {m10, m11, m12, m13},
+                {m20, m21, m22, m23},
+                {m30, m31, m32, m33}
+        };
+    }
+
+    public Matrix4x4(Matrix4x4 t) {
+        double [][] m = t.toArray();
+        this.matrix = m;
+    }
+
+    public double[][] toArray() {
+        return matrix;
+    }
+
+
 
     public double[][] getMatrix() {
         return matrix;
