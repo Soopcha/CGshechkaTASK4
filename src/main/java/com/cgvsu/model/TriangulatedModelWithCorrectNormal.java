@@ -3,11 +3,9 @@ package com.cgvsu.model;
 
 
 
-import com.cgvsu.math.vector.Vector3;
 import com.cgvsu.triangulation.Normals;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import static com.cgvsu.triangulation.Triangulation.triangulation;
@@ -18,16 +16,19 @@ public class TriangulatedModelWithCorrectNormal {
 
     public TriangulatedModelWithCorrectNormal(Model initialModel) {
         //НОРМАЛИИИИ //   RenderingPreparationUtilities.recalculateNormals(initialModel);
-        recalculateNormals();
         this.initialModel = initialModel;
-        this.triangulatedPolygons = triangulatePolygons(initialModel.polygons);
+        recalculateNormals();
+      this.triangulatedPolygons = triangulatePolygons(initialModel.polygons);
+//        this.initialModel.polygons = this.triangulatedPolygons;
+//
+        this.initialModel.setPolygons(triangulatePolygons(this.triangulatedPolygons));
     }
 
 
     public void recalculateNormals() {
         initialModel.normals.clear();
         Normals normals = new Normals(initialModel);
-        initialModel.normals.addAll((Collection<? extends Vector3>) normals);
+        initialModel.normals.addAll(normals.getNormals());
 
     }
 
@@ -39,8 +40,8 @@ public class TriangulatedModelWithCorrectNormal {
         return triangulatedPolygons;
     }
 
-    public static List<Polygon> triangulatePolygons(List<Polygon> initialPolygons) {
-        List<Polygon> triangulationPolygons = new ArrayList<>();
+    public static ArrayList<Polygon> triangulatePolygons(List<Polygon> initialPolygons) {
+        ArrayList<Polygon> triangulationPolygons = new ArrayList<>();
 
         for (Polygon polygon : initialPolygons) {
             triangulationPolygons.addAll(triangulation(polygon));

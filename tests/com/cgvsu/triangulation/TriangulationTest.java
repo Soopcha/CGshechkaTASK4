@@ -291,8 +291,6 @@ class TriangulationTest {
             Vector3 expected = expectedResult.get(i);
             Vector3 result = model.normals.get(i);
 
-            System.out.println("Calculated Normal: " + result.getX() + " " + result.getY()+ " " + result.getZ());
-
             assertEquals(expected.getX(), result.getX(), 0.01);
             assertEquals(expected.getY(), result.getY(), 0.01);
             assertEquals(expected.getZ(), result.getZ(), 0.01);
