@@ -1,9 +1,15 @@
 package com.cgvsu.math.vector;
 
+import java.util.List;
+import java.util.Objects;
+
 public class Vector3 {
     private double x;
     private double y;
     private double z;
+
+    public Vector3() {
+    }
 
     public Vector3(double x, double y, double z) {
         this.x = x;
@@ -72,7 +78,7 @@ public class Vector3 {
 
     // Вычисление длины вектора
     public double length() {
-        return Math.sqrt(x*x + y*y + z*z);
+        return Math.sqrt(x * x + y*y + z*z);
     }
 
     // Нормализация вектора
@@ -93,4 +99,85 @@ public class Vector3 {
         double newZ = this.x * other.y - this.y * other.x;
         return new Vector3(newX, newY, newZ);
     }
+
+
+    //дописала по коду Артема п
+    public void cross(Vector3 v1, Vector3 v2) {
+        if (v1 == null || v2 == null) {
+            throw new IllegalArgumentException("Vector can not be null");
+        }
+
+        double x = v1.y * v2.z - v1.z * v2.y;
+        double y = v2.x * v1.z - v2.z * v1.x;
+
+        this.z = v1.x * v2.y - v1.y * v2.x;
+        this.x = x;
+        this.y = y;
+    }
+
+
+    public static Vector3 fromTwoPoints(Vector3 vertex1, Vector3 vertex2) {
+        return new Vector3(vertex2.x - vertex1.x,
+                vertex2.y - vertex1.y,
+                vertex2.z - vertex1.z);
+    }
+
+    public static Vector3 sum(List<Vector3> vectors) {
+        if (vectors == null || vectors.isEmpty()) {
+            throw new IllegalArgumentException("List of vectors is null or empty");
+        }
+
+        double sumX = 0.0;
+        double sumY = 0.0;
+        double sumZ = 0.0;
+
+        for (Vector3 vector : vectors) {
+            sumX += vector.getX();
+            sumY += vector.getY();
+            sumZ += vector.getZ();
+        }
+
+        return new Vector3(sumX, sumY, sumZ);
+    }
+
+    //дописала по коду Артема п 3 метода
+    @Override
+    public int hashCode() {
+        return Objects.hash(x, y, z);
+    }
+
+
+    /* @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Vector3 vector3 = (Vector3) o;
+        return Double.compare(vector3.getX(), x) == 0 &&
+                Double.compare(vector3.getY(), y) == 0 &&
+                Double.compare(vector3.getZ(), z) == 0;
+    }
+
+     */
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Vector3 vector3 = (Vector3) o;
+        return Math.abs(vector3.getX() - x) < EPSILON &&
+                Math.abs(vector3.getY() - y) < EPSILON &&
+                Math.abs(vector3.getZ() - z) < EPSILON;
+    }
+
+    private static final double EPSILON = 1e-10;  // или любое другое подходящее значение погрешности
+
+    @Override
+    public String toString() {
+        return "Vector3{" +
+                "x=" + x +
+                ", y=" + y +
+                ", z=" + z +
+                '}';
+    }
+
 }
