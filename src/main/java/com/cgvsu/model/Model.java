@@ -12,6 +12,10 @@ public class Model {
     public ArrayList<Vector3> normals = new ArrayList<>();
     public ArrayList<Polygon> polygons = new ArrayList<Polygon>();
 
+    public void setPolygons(ArrayList<Polygon> polygons) {
+        this.polygons = polygons;
+    }
+
     public Model(ArrayList<Vector3> vertices, ArrayList<Vector2> textureVertices, ArrayList<Vector3> normals, ArrayList<Polygon> polygons) {
         this.vertices = vertices;
         this.textureVertices = textureVertices;
