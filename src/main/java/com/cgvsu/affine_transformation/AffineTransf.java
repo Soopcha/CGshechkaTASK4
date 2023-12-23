@@ -16,7 +16,7 @@ public class AffineTransf {
     private double Sy = 1;
     private double Sz = 1;
     //Параметры поворота
-    //УГЛЫ ПОВОРОТА ЗАДАЮТСЯ ПО ЧАСОВОЙ СРЕЛКЕ В ГРАДУСАХ
+    //УГЛЫ ПОВОРОТА ЗАДАЮТСЯ ПО ЧАСОВОЙ СТРЕЛКЕ В ГРАДУСАХ
     private double Rx = 0;
     private double Ry = 0;
     private double Rz = 0;
