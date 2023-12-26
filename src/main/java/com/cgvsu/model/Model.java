@@ -1,5 +1,6 @@
 package com.cgvsu.model;
 
+import com.cgvsu.affine_transformation.AffineTransf;
 import com.cgvsu.math.vector.Vector2;
 import com.cgvsu.math.vector.Vector3;
 
@@ -12,6 +13,7 @@ public class Model {
     public ArrayList<Vector2> textureVertices = new ArrayList<Vector2>();
     public ArrayList<Vector3> normals = new ArrayList<>();
     public ArrayList<Polygon> polygons = new ArrayList<Polygon>();
+
 
     public void setPolygons(ArrayList<Polygon> polygons) {
         this.polygons = polygons;
@@ -60,4 +62,6 @@ public class Model {
     public boolean isEmpty() {
         return vertices.isEmpty();
     }
+
+
 }

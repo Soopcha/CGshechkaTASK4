@@ -65,7 +65,7 @@ import javafx.scene.control.ComboBox;
 
 
 public class GuiController {
-    private TransformedModel transformedModel;
+    public TransformedModel transformedModel;
 
     private int selectedModelIndex = 0;
     private List<Boolean> modelVisibility = new ArrayList<>();
@@ -186,6 +186,11 @@ public class GuiController {
     private void handleModelSelection(ActionEvent event) {
         int selectedIndex = modelComboBox.getSelectionModel().getSelectedIndex();
         if (selectedIndex >= 0 && selectedIndex < models.size()) {
+            // Сброс трансформаций у предыдущей активной модели
+            if (activeModelIndex >= 0 && activeModelIndex < models.size()) {
+                resetTransformations();
+            }
+
             activeModelIndex = selectedIndex;
 
             // Устанавливаем видимость для выбранной модели в true, а для остальных в false
@@ -195,6 +200,16 @@ public class GuiController {
         }
     }
 
+    private void resetTransformations() {
+        AffineTransf zeroTransformations = new AffineTransf(
+                OrderRotation.XYZ, 1, 1, 1,
+                0, 0, 0,
+                0, 0, 0);
+
+        TriangulatedModelWithCorrectNormal triangulatedModelWithCorrectNormal = new TriangulatedModelWithCorrectNormal(getActiveModel());
+
+        transformedModel = new TransformedModel(triangulatedModelWithCorrectNormal, zeroTransformations);
+    }
 
 
     @FXML
@@ -242,6 +257,14 @@ public class GuiController {
 
             String fileName = file.getAbsolutePath();
             ObjWriter.write(fileName, models.get(currentModelIndex));
+        }
+    }
+
+    public Model getActiveModel() {
+        if (activeModelIndex >= 0 && activeModelIndex < models.size()) {
+            return transformedModel.getTransformations().transformModel(models.get(activeModelIndex));
+        } else {
+            return null; // Индекс за пределами массива
         }
     }
 
@@ -314,11 +337,12 @@ public class GuiController {
     @FXML
     private void onTransformButtonClick() {
         try {
-            if (mesh == null) {
+            Model activeModel = getActiveModel();
+            if (activeModel == null) {
                 Alert alert = new Alert(Alert.AlertType.WARNING);
                 alert.setTitle("Внимание");
-                alert.setHeaderText("Модель не загружена");
-                alert.setContentText("Пожалуйста, загрузите модель перед применением трансформаций.");
+                alert.setHeaderText("Модель не выбрана");
+                alert.setContentText("Пожалуйста, выберите модель перед применением трансформаций.");
                 alert.showAndWait();
                 return;
             }
@@ -326,11 +350,8 @@ public class GuiController {
             updateTransformations();
 
             // Применить трансформации только к активной модели
-            if (activeModelIndex >= 0 && activeModelIndex < models.size()) {
-                Model activeModel = models.get(activeModelIndex);
-                Model transformedMesh = transformedModel.getTransformations().transformModel(activeModel);
-                RenderEngine.render(canvas.getGraphicsContext2D(), camera, transformedMesh, (int) canvas.getWidth(), (int) canvas.getHeight());
-            }
+            Model transformedMesh = transformedModel.getTransformations().transformModel(activeModel);
+            RenderEngine.render(canvas.getGraphicsContext2D(), camera, transformedMesh, (int) canvas.getWidth(), (int) canvas.getHeight());
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -338,6 +359,36 @@ public class GuiController {
     }
 
 
+
+//    @FXML
+//    private void updateTransformations() {
+//        try {
+//            double xRotate = Double.parseDouble(xRotateField.getText());
+//            double yRotate = Double.parseDouble(yRotateField.getText());
+//            double zRotate = Double.parseDouble(zRotateField.getText());
+//
+//            double xScaleValue = Double.parseDouble(xScale.getText());
+//            double yScaleValue = Double.parseDouble(yScale.getText());
+//            double zScaleValue = Double.parseDouble(zScale.getText());
+//
+//            double translateXValue = Double.parseDouble(translateX.getText());
+//            double translateYValue = Double.parseDouble(translateY.getText());
+//            double translateZValue = Double.parseDouble(translateZ.getText());
+//
+//            AffineTransf updatedTransformations = new AffineTransf(
+//                    OrderRotation.XYZ, xScaleValue, yScaleValue, zScaleValue,
+//                    xRotate, yRotate, zRotate,
+//                    translateXValue, translateYValue, translateZValue);
+//
+//            TriangulatedModelWithCorrectNormal triangulatedModelWithCorrectNormal = new TriangulatedModelWithCorrectNormal(getActiveModel());
+//
+//            transformedModel = new TransformedModel(triangulatedModelWithCorrectNormal, updatedTransformations);
+//
+//        } catch (NumberFormatException e) {
+//
+//            e.printStackTrace();
+//        }
+//    }
 
     @FXML
     private void updateTransformations() {
@@ -359,15 +410,15 @@ public class GuiController {
                     xRotate, yRotate, zRotate,
                     translateXValue, translateYValue, translateZValue);
 
-            TriangulatedModelWithCorrectNormal triangulatedModelWithCorrectNormal = new TriangulatedModelWithCorrectNormal(mesh);
+            TriangulatedModelWithCorrectNormal triangulatedModelWithCorrectNormal = new TriangulatedModelWithCorrectNormal(getActiveModel());
 
             transformedModel = new TransformedModel(triangulatedModelWithCorrectNormal, updatedTransformations);
 
         } catch (NumberFormatException e) {
-
             e.printStackTrace();
         }
     }
+
     private void handleMouseEvents(MouseEvent event) {
         if (event.getEventType() == MouseEvent.MOUSE_PRESSED) {
             mouseX = event.getSceneX();
