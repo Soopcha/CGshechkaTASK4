@@ -167,7 +167,6 @@ public class RenderEngine {
         }
     }
 
-
     private static double barycentricCoordinate(
             double x1, double y1,
             double x2, double y2,
