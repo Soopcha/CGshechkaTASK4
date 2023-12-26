@@ -7,6 +7,7 @@ import java.util.*;
 
 public class Model {
 
+    public String modelName = "";
     public ArrayList<Vector3> vertices = new ArrayList<Vector3>();
     public ArrayList<Vector2> textureVertices = new ArrayList<Vector2>();
     public ArrayList<Vector3> normals = new ArrayList<>();

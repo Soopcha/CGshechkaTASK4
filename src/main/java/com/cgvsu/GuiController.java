@@ -35,10 +35,43 @@ import com.cgvsu.objreader.ObjReader;
 import com.cgvsu.render_engine.Camera;
 
 
+
+
+import com.cgvsu.model.Model;
+import com.cgvsu.objreader.IncorrectFileException;
+import com.cgvsu.objreader.ObjReader;
+import com.cgvsu.objwriter.ObjWriter;
+import com.cgvsu.render_engine.Camera;
+import com.cgvsu.render_engine.RenderEngine;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.layout.AnchorPane;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+import javafx.util.Duration;
+
+import javax.vecmath.Vector3f;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import javafx.scene.control.ComboBox;
+
+
 public class GuiController {
     private TransformedModel transformedModel;
 
+    private int selectedModelIndex = 0;
+    private List<Boolean> modelVisibility = new ArrayList<>();
     final private float TRANSLATION = 0.5F;
+
+    private int activeModelIndex = 0;
 
     @FXML
     AnchorPane anchorPane;
@@ -46,7 +79,12 @@ public class GuiController {
     @FXML
     private Canvas canvas;
 
+    @FXML
+    private ComboBox<String> modelComboBox; // Добавлен ComboBox
+
     private Model mesh = null;
+    private List<Model> models = new ArrayList<>();
+    private int currentModelIndex = 0;
     @FXML
     public TextField xRotateField;
     @FXML
@@ -93,6 +131,11 @@ public class GuiController {
         translateY.setText("0");
         translateZ.setText("0");
 
+        // Инициализируем список видимости для каждой модели
+        for (int i = 0; i < models.size(); i++) {
+            modelVisibility.add(true);
+        }
+
         KeyFrame frame = new KeyFrame(Duration.millis(15), event -> {
             double width = canvas.getWidth();
             double height = canvas.getHeight();
@@ -106,6 +149,11 @@ public class GuiController {
                 RenderEngine.render(canvas.getGraphicsContext2D(), camera, transformedModel.getTransformations().transformModel(mesh), (int) width, (int) height);
 
             }
+            for (Model model : models) {
+                RenderEngine.render(canvas.getGraphicsContext2D(), camera, model, (int) width, (int) height);
+            }
+
+            renderScene();
         });
 
 
@@ -113,7 +161,40 @@ public class GuiController {
         timeline.play();
         canvas.addEventHandler(MouseEvent.ANY, this::handleMouseEvents);
         canvas.addEventHandler(ScrollEvent.SCROLL, this::handleScrollEvent);
+
+        // Инициализация ComboBox с названиями моделей
+        updateModelComboBox();
     }
+
+    // Метод для обновления ComboBox с названиями моделей
+    private void updateModelComboBox() {
+        modelComboBox.getItems().clear();
+        for (Model model : models) {
+            modelComboBox.getItems().add(model.modelName);
+        }
+    }
+
+    // Добавленный метод для обработки выбора модели в ComboBox
+    @FXML
+//    private void handleModelSelection(ActionEvent event) {
+//        int selectedIndex = modelComboBox.getSelectionModel().getSelectedIndex();
+//        if (selectedIndex >= 0 && selectedIndex < models.size()) {
+//            currentModelIndex = selectedIndex;
+//        }
+//    }
+
+    private void handleModelSelection(ActionEvent event) {
+        int selectedIndex = modelComboBox.getSelectionModel().getSelectedIndex();
+        if (selectedIndex >= 0 && selectedIndex < models.size()) {
+            activeModelIndex = selectedIndex;
+
+            // Устанавливаем видимость для выбранной модели в true, а для остальных в false
+            for (int i = 0; i < modelVisibility.size(); i++) {
+                modelVisibility.set(i, (i == activeModelIndex));
+            }
+        }
+    }
+
 
 
     @FXML
@@ -131,31 +212,37 @@ public class GuiController {
 
         try {
             String fileContent = Files.readString(fileName);
+            String objName = String.valueOf(fileName.getFileName());
             mesh = ObjReader.read(fileContent);
             TriangulatedModelWithCorrectNormal triangulatedModelWithCorrectNormal = new TriangulatedModelWithCorrectNormal(mesh);
             transformedModel = new TransformedModel(triangulatedModelWithCorrectNormal, new AffineTransf());
+            Model model = ObjReader.read(fileContent);
+            models.add(model);
+            model.modelName = objName;
 
 
-
-            // todo: обработка ошибок
+            // Обновление ComboBox с названиями моделей
+            updateModelComboBox();
         } catch (IOException exception) {
-
+            // Обработка IOException
         }
     }
 
     @FXML
     private void onSaveModelMenuItemClick() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Model (*.obj)", "*.obj"));
-        fileChooser.setTitle("Save Original Model");
+        if (!models.isEmpty()) {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Model (*.obj)", "*.obj"));
+            fileChooser.setTitle("Save Original Model");
 
-        File file = fileChooser.showSaveDialog((Stage) canvas.getScene().getWindow());
-        if (file == null) {
-            return;
+            File file = fileChooser.showSaveDialog((Stage) canvas.getScene().getWindow());
+            if (file == null) {
+                return;
+            }
+
+            String fileName = file.getAbsolutePath();
+            ObjWriter.write(fileName, models.get(currentModelIndex));
         }
-
-        String fileName = file.getAbsolutePath();
-        ObjWriter.write(fileName, mesh);
     }
 
     @FXML
@@ -203,26 +290,53 @@ public class GuiController {
     }
 
 
+//    @FXML
+//    private void onTransformButtonClick() {
+//        try {
+//            if (mesh == null) {
+//                Alert alert = new Alert(Alert.AlertType.WARNING);
+//                alert.setTitle("Warning");
+//                alert.setHeaderText("No Model Loaded");
+//                alert.setContentText("Please load a model before applying transformations.");
+//                alert.showAndWait();
+//                return;
+//            }
+//            updateTransformations();
+//
+//            // Model transformedMesh = transformedModel.getTransformations().transformModel(mesh);
+//            //  RenderEngine.render(canvas.getGraphicsContext2D(), camera, transformedMesh, (int) canvas.getWidth(), (int) canvas.getHeight());
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
+
     @FXML
     private void onTransformButtonClick() {
         try {
             if (mesh == null) {
                 Alert alert = new Alert(Alert.AlertType.WARNING);
-                alert.setTitle("Warning");
-                alert.setHeaderText("No Model Loaded");
-                alert.setContentText("Please load a model before applying transformations.");
+                alert.setTitle("Внимание");
+                alert.setHeaderText("Модель не загружена");
+                alert.setContentText("Пожалуйста, загрузите модель перед применением трансформаций.");
                 alert.showAndWait();
                 return;
             }
+
             updateTransformations();
 
-            // Model transformedMesh = transformedModel.getTransformations().transformModel(mesh);
-            //  RenderEngine.render(canvas.getGraphicsContext2D(), camera, transformedMesh, (int) canvas.getWidth(), (int) canvas.getHeight());
+            // Применить трансформации только к активной модели
+            if (activeModelIndex >= 0 && activeModelIndex < models.size()) {
+                Model activeModel = models.get(activeModelIndex);
+                Model transformedMesh = transformedModel.getTransformations().transformModel(activeModel);
+                RenderEngine.render(canvas.getGraphicsContext2D(), camera, transformedMesh, (int) canvas.getWidth(), (int) canvas.getHeight());
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
 
 
     @FXML
@@ -280,4 +394,39 @@ public class GuiController {
         camera.movePosition(new Vector3f(0, 0, (float) deltaZoom));
     }
 
+    private void renderActiveModel() {
+        double width = canvas.getWidth();
+        double height = canvas.getHeight();
+
+        canvas.getGraphicsContext2D().clearRect(0, 0, width, height);
+        camera.setAspectRatio((float) (width / height));
+
+        if (activeModelIndex >= 0 && activeModelIndex < models.size()) {
+            Model activeModel = models.get(activeModelIndex);
+            RenderEngine.render(canvas.getGraphicsContext2D(), camera, transformedModel.getTransformations().transformModel(activeModel), (int) width, (int) height);
+        }
+    }
+
+    private void renderAllModels() {
+        double width = canvas.getWidth();
+        double height = canvas.getHeight();
+
+        canvas.getGraphicsContext2D().clearRect(0, 0, width, height);
+        camera.setAspectRatio((float) (width / height));
+
+        for (int i = 0; i < models.size(); i++) {
+            if (modelVisibility.get(i)) {
+                Model model = models.get(i);
+                RenderEngine.render(canvas.getGraphicsContext2D(), camera, model, (int) width, (int) height);
+            }
+        }
+    }
+
+    private void renderScene() {
+        if (activeModelIndex >= 0 && activeModelIndex < models.size()) {
+            renderActiveModel();
+        } else {
+            renderAllModels();
+        }
+    }
 }

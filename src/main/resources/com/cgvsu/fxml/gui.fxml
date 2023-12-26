@@ -15,6 +15,7 @@
 <?import javafx.scene.control.ContextMenu?>
 <?import javafx.scene.control.CustomMenuItem?>
 <?import javafx.scene.text.Text?>
+<?import javafx.scene.control.ComboBox?>
 <AnchorPane fx:id="anchorPane" xmlns:fx="http://javafx.com/fxml" fx:controller="com.cgvsu.GuiController">
     <MenuBar>
         <Menu mnemonicParsing="false" text="File">
@@ -121,6 +122,13 @@
             </CustomMenuItem>
         </Menu>
     </MenuBar>
+
+    <ComboBox fx:id="modelComboBox" onAction="#handleModelSelection" promptText="Select model"
+              AnchorPane.topAnchor="10.0" AnchorPane.rightAnchor="10.0">
+        <items>
+            <!-- Здесь будет динамически добавляться список моделей -->
+        </items>
+    </ComboBox>
 
     <Canvas fx:id="canvas" width="1600" height="870" AnchorPane.topAnchor="30.0"/>
 </AnchorPane>
