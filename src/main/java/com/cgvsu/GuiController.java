@@ -37,6 +37,8 @@ import com.cgvsu.render_engine.Camera;
 
 public class GuiController {
     private TransformedModel transformedModel;
+    private double[][] zBuffer;
+
 
     final private float TRANSLATION = 0.5F;
 
@@ -79,6 +81,15 @@ public class GuiController {
         anchorPane.prefWidthProperty().addListener((ov, oldValue, newValue) -> canvas.setWidth(newValue.doubleValue()));
         anchorPane.prefHeightProperty().addListener((ov, oldValue, newValue) -> canvas.setHeight(newValue.doubleValue()));
 
+        zBuffer = new double[(int) canvas.getWidth()][(int) canvas.getHeight()];
+        for (int i = 0; i < canvas.getWidth(); i++) {
+            for (int j = 0; j < canvas.getHeight(); j++) {
+                zBuffer[i][j] = Double.POSITIVE_INFINITY; // Инициализация значением положительной бесконечности
+            }
+        }
+        RenderEngine.setZBuffer(zBuffer);
+
+
         timeline = new Timeline();
         timeline.setCycleCount(Animation.INDEFINITE);
         xRotateField.setText("0");
@@ -93,9 +104,12 @@ public class GuiController {
         translateY.setText("0");
         translateZ.setText("0");
 
+
+
         KeyFrame frame = new KeyFrame(Duration.millis(15), event -> {
             double width = canvas.getWidth();
             double height = canvas.getHeight();
+            clearZBuffer();
 
             canvas.getGraphicsContext2D().clearRect(0, 0, width, height);
             camera.setAspectRatio((float) (width / height));
@@ -109,10 +123,19 @@ public class GuiController {
         });
 
 
+
         timeline.getKeyFrames().add(frame);
         timeline.play();
         canvas.addEventHandler(MouseEvent.ANY, this::handleMouseEvents);
         canvas.addEventHandler(ScrollEvent.SCROLL, this::handleScrollEvent);
+    }
+    private void clearZBuffer() {
+
+        for (int i = 0; i < canvas.getWidth(); i++) {
+            for (int j = 0; j < canvas.getHeight(); j++) {
+                zBuffer[i][j] = Double.POSITIVE_INFINITY;
+            }
+        }
     }
 
 
@@ -216,8 +239,9 @@ public class GuiController {
             }
             updateTransformations();
 
-            // Model transformedMesh = transformedModel.getTransformations().transformModel(mesh);
-            //  RenderEngine.render(canvas.getGraphicsContext2D(), camera, transformedMesh, (int) canvas.getWidth(), (int) canvas.getHeight());
+            //нижнее 2 стр были поч в комите
+            Model transformedMesh = transformedModel.getTransformations().transformModel(mesh);
+             RenderEngine.render(canvas.getGraphicsContext2D(), camera, transformedMesh, (int) canvas.getWidth(), (int) canvas.getHeight());
 
         } catch (Exception e) {
             e.printStackTrace();
