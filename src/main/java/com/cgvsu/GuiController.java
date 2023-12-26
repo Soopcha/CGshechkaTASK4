@@ -17,6 +17,8 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.stage.FileChooser;
@@ -40,7 +42,7 @@ public class GuiController {
 
     @FXML
     AnchorPane anchorPane;
-
+    private double mouseX, mouseY;
     @FXML
     private Canvas canvas;
 
@@ -109,6 +111,8 @@ public class GuiController {
 
         timeline.getKeyFrames().add(frame);
         timeline.play();
+        canvas.addEventHandler(MouseEvent.ANY, this::handleMouseEvents);
+        canvas.addEventHandler(ScrollEvent.SCROLL, this::handleScrollEvent);
     }
 
 
@@ -249,6 +253,31 @@ public class GuiController {
 
             e.printStackTrace();
         }
+    }
+    private void handleMouseEvents(MouseEvent event) {
+        if (event.getEventType() == MouseEvent.MOUSE_PRESSED) {
+            mouseX = event.getSceneX();
+            mouseY = event.getSceneY();
+        } else if (event.getEventType() == MouseEvent.MOUSE_DRAGGED) {
+            double deltaX = event.getSceneX() - mouseX;
+            double deltaY = event.getSceneY() - mouseY;
+
+            double sensitivity = 0.2;
+
+            camera.movePosition(new Vector3f((float) (-deltaX * sensitivity), (float) (deltaY * sensitivity), 0));
+
+            mouseX = event.getSceneX();
+            mouseY = event.getSceneY();
+        }
+    }
+
+    private void handleScrollEvent(ScrollEvent event) {
+
+        double sensitivity = 0.1;
+
+
+        double deltaZoom = event.getDeltaY() * sensitivity;
+        camera.movePosition(new Vector3f(0, 0, (float) deltaZoom));
     }
 
 }
