@@ -87,7 +87,7 @@ public class GuiController {
                 zBuffer[i][j] = Double.POSITIVE_INFINITY; // Инициализация значением положительной бесконечности
             }
         }
-        RenderEngine.setZBuffer(zBuffer);
+       // RenderEngine.setZBuffer(zBuffer);
 
 
         timeline = new Timeline();
@@ -117,7 +117,7 @@ public class GuiController {
             if (mesh != null) {
 
                 // RenderEngine.render(canvas.getGraphicsContext2D(), camera, mesh, (int) width, (int) height);
-                RenderEngine.render(canvas.getGraphicsContext2D(), camera, transformedModel.getTransformations().transformModel(mesh), (int) width, (int) height);
+                RenderEngine.render(canvas.getGraphicsContext2D(), camera, transformedModel.getTransformations().transformModel(mesh), (int) width, (int) height,zBuffer);
 
             }
         });
@@ -240,8 +240,8 @@ public class GuiController {
             updateTransformations();
 
             //нижнее 2 стр были поч в комите
-            Model transformedMesh = transformedModel.getTransformations().transformModel(mesh);
-             RenderEngine.render(canvas.getGraphicsContext2D(), camera, transformedMesh, (int) canvas.getWidth(), (int) canvas.getHeight());
+            // Model transformedMesh = transformedModel.getTransformations().transformModel(mesh);
+             //RenderEngine.render(canvas.getGraphicsContext2D(), camera, transformedMesh, (int) canvas.getWidth(), (int) canvas.getHeight());
 
         } catch (Exception e) {
             e.printStackTrace();

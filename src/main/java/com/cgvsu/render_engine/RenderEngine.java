@@ -15,18 +15,19 @@ import javafx.scene.paint.Color;
 import static com.cgvsu.render_engine.GraphicConveyor.*;
 
 public class RenderEngine {
-    private static double[][] zBuffer; // Добавьте это
-
-    public static void setZBuffer(double[][] buffer) {
-        zBuffer = buffer;
-    }
+//    private static double[][] zBuffer; // Добавьте это
+//
+//    public static void setZBuffer(double[][] buffer) {
+//        zBuffer = buffer;
+//    }
 
     public static void render(
             final GraphicsContext graphicsContext,
             final Camera camera,
             final Model mesh,
             final int width,
-            final int height) {
+            final int height,
+            double[][] zBuffer ) {
 
         Matrix4f modelMatrix = rotateScaleTranslate();
         Matrix4f viewMatrix = camera.getViewMatrix();
@@ -71,7 +72,8 @@ public class RenderEngine {
                     mesh,
                     (int) width,
                     (int) height,
-                    Color.RED);
+                    Color.RED,
+                    zBuffer);
 //                graphicsContext.strokeLine(
 //                        resultPoints.get(nVerticesInPolygon - 1).x,
 //                        resultPoints.get(nVerticesInPolygon - 1).y,
@@ -80,7 +82,7 @@ public class RenderEngine {
         }
     }
 
-    private static void fillPolygons(GraphicsContext graphicsContext, Camera camera, Model mesh, int width, int height, Color fillColor) {
+    private static void fillPolygons(GraphicsContext graphicsContext, Camera camera, Model mesh, int width, int height, Color fillColor, double[][] zBuffer) {
         // Получаем матрицы преобразования
 
         Matrix4f modelMatrix = rotateScaleTranslate();
@@ -103,7 +105,7 @@ public class RenderEngine {
             }
 
             // Растеризация треугольника
-            rasterizeTriangle(graphicsContext, polygonVertices, width, height, fillColor);
+            rasterizeTriangle(graphicsContext, polygonVertices, width, height, fillColor,zBuffer);
         }
     }
 
@@ -112,7 +114,9 @@ public class RenderEngine {
             final List<Vector3> triangleVertices,
             final int width,
             final int height,
-            final Color fillColor) {
+            final Color fillColor,
+            double[][] zBuffer
+    ) {
         // Получаем координаты вершин треугольника
         double x1 = triangleVertices.get(0).getX();
         double y1 = triangleVertices.get(0).getY();
