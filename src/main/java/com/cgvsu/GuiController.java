@@ -321,9 +321,14 @@ public class GuiController {
             mesh = ObjReader.read(fileContent);
             TriangulatedModelWithCorrectNormal triangulatedModelWithCorrectNormal = new TriangulatedModelWithCorrectNormal(mesh);
             transformedModel = new TransformedModel(triangulatedModelWithCorrectNormal, new AffineTransf());
-            Model model = ObjReader.read(fileContent);
-            models.add(model);
-            model.modelName = objName;
+            //Model model = ObjReader.read(fileContent);
+            transformedModel.getTriangulatedModel().getInitialModel().modelName = objName;
+            models.add(transformedModel.getTriangulatedModel().getInitialModel());
+
+
+            //models.add(model);
+            //models.add(transformedModel.getTriangulatedModel().getInitialModel());
+
 
 
             // todo: обработка ошибок
