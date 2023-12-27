@@ -30,11 +30,13 @@
                 <accelerator>
                     <KeyCodeCombination alt="DOWN" control="DOWN" meta="DOWN" shift="DOWN" shortcut="DOWN" code="S"/>
                 </accelerator>
-            </MenuItem> <MenuItem mnemonicParsing="false" onAction="#onSaveTransformedModelButtonClick" text="Save Transformed Model">
-            <accelerator>
-                <KeyCodeCombination alt="DOWN" control="DOWN" meta="DOWN" shift="DOWN" shortcut="DOWN" code="T"/>
-            </accelerator>
-        </MenuItem>
+            </MenuItem>
+            <MenuItem mnemonicParsing="false" onAction="#onSaveTransformedModelButtonClick"
+                      text="Save Transformed Model">
+                <accelerator>
+                    <KeyCodeCombination alt="DOWN" control="DOWN" meta="DOWN" shift="DOWN" shortcut="DOWN" code="T"/>
+                </accelerator>
+            </MenuItem>
         </Menu>
 
         <Menu mnemonicParsing="false" text="Camera Options">
@@ -121,6 +123,32 @@
                         <TextField fx:id="removePolygonsField"/>
                         <Button onAction="#onRemoveButtonClick" text="Remove"/>
                         <Button onAction="#onTransformButtonClick" text="Transform Model"/>
+                    </VBox>
+                </content>
+            </CustomMenuItem>
+        </Menu>
+        <Menu mnemonicParsing="false" text="Camera Actions">
+            <CustomMenuItem>
+                <content>
+                    <VBox spacing="5">
+                        <Text text="New Camera Position (X, Y, Z):"/>
+                        <HBox>
+                            <Text text="X:"/>
+                            <TextField fx:id="newCameraX"/>
+                        </HBox>
+                        <HBox>
+                            <Text text="Y:"/>
+                            <TextField fx:id="newCameraY"/>
+                        </HBox>
+                        <HBox>
+                            <Text text="Z:"/>
+                            <TextField fx:id="newCameraZ"/>
+                        </HBox>
+
+                        <Button fx:id="addCameraButton" text="Add Camera" onAction="#addCamera"/>
+                        <Button fx:id="removeCameraButton" text="Remove Camera" onAction="#removeCamera"/>
+                        <Button fx:id="switchCameraButton" text="Switch Camera" onAction="#switchCamera"/>
+
                     </VBox>
                 </content>
             </CustomMenuItem>
