@@ -1,12 +1,18 @@
 package com.cgvsu.render_engine;
-import javax.vecmath.Vector3f;
-import javax.vecmath.Matrix4f;
+import com.cgvsu.math.matrix.Matrix4x4;
+import com.cgvsu.math.vector.Vector3;
+import static com.cgvsu.math.matrix.Matrix4x4.*;
+
 
 public class Camera {
 
+    private double mousePosX;
+    private double mousePosY;
+    public double mouseDeltaY;
+
     public Camera(
-            final Vector3f position,
-            final Vector3f target,
+            final Vector3 position,
+            final Vector3 target,
             final float fov,
             final float aspectRatio,
             final float nearPlane,
@@ -19,11 +25,11 @@ public class Camera {
         this.farPlane = farPlane;
     }
 
-    public void setPosition(final Vector3f position) {
+    public void setPosition(final Vector3 position) {
         this.position = position;
     }
 
-    public void setTarget(final Vector3f target) {
+    public void setTarget(final Vector3 target) {
         this.target = target;
     }
 
@@ -31,34 +37,64 @@ public class Camera {
         this.aspectRatio = aspectRatio;
     }
 
-    public Vector3f getPosition() {
+    public Vector3 getPosition() {
         return position;
     }
 
-    public Vector3f getTarget() {
+    public Vector3 getTarget() {
         return target;
     }
 
-    public void movePosition(final Vector3f translation) {
+    public void movePosition(final Vector3 translation) {
         this.position.add(translation);
     }
 
-    public void moveTarget(final Vector3f translation) {
+    public void moveTarget(final Vector3 translation) {
         this.target.add(target);
     }
 
-    Matrix4f getViewMatrix() {
-        return GraphicConveyor.lookAt(position, target);
+    Matrix4x4 getViewMatrix() {
+        return lookAt(position, target);
     }
 
-    Matrix4f getProjectionMatrix() {
-        return GraphicConveyor.perspective(fov, aspectRatio, nearPlane, farPlane);
+    Matrix4x4 getProjectionMatrix() {
+        return perspective(fov, aspectRatio, nearPlane, farPlane);
     }
 
-    private Vector3f position;
-    private Vector3f target;
+    private Vector3 position;
+    private Vector3 target;
     private float fov;
     private float aspectRatio;
     private float nearPlane;
     private float farPlane;
+    public void handleMouseInput(double x, double y, boolean isPrimaryButtonDown, boolean isSecondaryButtonDown) {
+
+        if (isPrimaryButtonDown) {
+            rotateCamera((double) (x - mousePosX), (double) (y - mousePosY));
+        } else if (isSecondaryButtonDown) {
+            movePosition(new Vector3((float) (x - mousePosX) * 0.1f, (float) (+y - mousePosY) * 0.1f, 0));
+        } else {
+            if (mouseDeltaY > 0) {
+                position.subtractThis((position.subtract(target).divide(75)));
+            } else if (mouseDeltaY < 0) {
+                position.addThis((position.subtract(target).divide(75)));
+            }
+            mouseDeltaY = 0;
+        }
+
+        mousePosX = x;
+        mousePosY = y;
+    }
+
+    private void rotateCamera(double dx, double dy) {
+        double rotationX = -dy * 0.2;
+        double rotationY = -dx * 0.2;
+
+        Matrix4x4 rotationMatrixX = rotate(rotationX, 1, 0, 0);
+        Matrix4x4 rotationMatrixY = rotate(rotationY, 0, 1, 0);
+
+        Matrix4x4 rotationMatrix = rotationMatrixX.multiply(rotationMatrixY);
+
+        position = multiplyMatrix4ByVector3(rotationMatrix, position);
+    }
 }

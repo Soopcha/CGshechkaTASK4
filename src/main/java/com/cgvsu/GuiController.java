@@ -1,6 +1,6 @@
 package com.cgvsu;
 
-//import com.cgvsu.model.TransformedTriangulatedModel;
+import com.cgvsu.math.vector.Vector3;
 import com.cgvsu.affine_transformation.AffineTransf;
 import com.cgvsu.affine_transformation.OrderRotation;
 import com.cgvsu.model.TransformedModel;
@@ -17,8 +17,6 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.stage.FileChooser;
@@ -27,7 +25,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.io.IOException;
 import java.io.File;
-import javax.vecmath.Vector3f;
 import com.cgvsu.objwriter.ObjWriter;
 
 import com.cgvsu.model.Model;
@@ -42,7 +39,7 @@ public class GuiController {
 
     @FXML
     AnchorPane anchorPane;
-    private double mouseX, mouseY;
+
     @FXML
     private Canvas canvas;
 
@@ -68,11 +65,12 @@ public class GuiController {
 
 
     private Camera camera = new Camera(
-            new Vector3f(0, 00, 100),
-            new Vector3f(0, 0, 0),
+            new Vector3(0, 0, 100),
+            new Vector3(0, 0, 0),
             1.0F, 1, 0.01F, 100);
 
     private Timeline timeline;
+
 
     @FXML
     private void initialize() {
@@ -111,8 +109,13 @@ public class GuiController {
 
         timeline.getKeyFrames().add(frame);
         timeline.play();
-        canvas.addEventHandler(MouseEvent.ANY, this::handleMouseEvents);
-        canvas.addEventHandler(ScrollEvent.SCROLL, this::handleScrollEvent);
+        canvas.setOnMouseMoved(event2 -> camera.handleMouseInput(event2.getX(), event2.getY(), false, false));
+        canvas.setOnMouseDragged(event2 -> camera.handleMouseInput(event2.getX(), event2.getY(), event2.isPrimaryButtonDown(), event2.isSecondaryButtonDown()));
+        canvas.setOnScroll(event2 -> {
+            camera.mouseDeltaY = event2.getDeltaY();
+            camera.handleMouseInput(event2.getX(), event2.getY(), false, false);
+        });
+
     }
 
 
@@ -174,32 +177,32 @@ public class GuiController {
     }
     @FXML
     public void handleCameraForward(ActionEvent actionEvent) {
-        camera.movePosition(new Vector3f(0, 0, -TRANSLATION));
+        camera.movePosition(new Vector3(0, 0, -TRANSLATION));
     }
 
     @FXML
     public void handleCameraBackward(ActionEvent actionEvent) {
-        camera.movePosition(new Vector3f(0, 0, TRANSLATION));
+        camera.movePosition(new Vector3(0, 0, TRANSLATION));
     }
 
     @FXML
     public void handleCameraLeft(ActionEvent actionEvent) {
-        camera.movePosition(new Vector3f(TRANSLATION, 0, 0));
+        camera.movePosition(new Vector3(TRANSLATION, 0, 0));
     }
 
     @FXML
     public void handleCameraRight(ActionEvent actionEvent) {
-        camera.movePosition(new Vector3f(-TRANSLATION, 0, 0));
+        camera.movePosition(new Vector3(-TRANSLATION, 0, 0));
     }
 
     @FXML
     public void handleCameraUp(ActionEvent actionEvent) {
-        camera.movePosition(new Vector3f(0, TRANSLATION, 0));
+        camera.movePosition(new Vector3(0, TRANSLATION, 0));
     }
 
     @FXML
     public void handleCameraDown(ActionEvent actionEvent) {
-        camera.movePosition(new Vector3f(0, -TRANSLATION, 0));
+        camera.movePosition(new Vector3(0, -TRANSLATION, 0));
     }
 
 
@@ -254,30 +257,4 @@ public class GuiController {
             e.printStackTrace();
         }
     }
-    private void handleMouseEvents(MouseEvent event) {
-        if (event.getEventType() == MouseEvent.MOUSE_PRESSED) {
-            mouseX = event.getSceneX();
-            mouseY = event.getSceneY();
-        } else if (event.getEventType() == MouseEvent.MOUSE_DRAGGED) {
-            double deltaX = event.getSceneX() - mouseX;
-            double deltaY = event.getSceneY() - mouseY;
-
-            double sensitivity = 0.2;
-
-            camera.movePosition(new Vector3f((float) (-deltaX * sensitivity), (float) (deltaY * sensitivity), 0));
-
-            mouseX = event.getSceneX();
-            mouseY = event.getSceneY();
-        }
-    }
-
-    private void handleScrollEvent(ScrollEvent event) {
-
-        double sensitivity = 0.1;
-
-
-        double deltaZoom = event.getDeltaY() * sensitivity;
-        camera.movePosition(new Vector3f(0, 0, (float) deltaZoom));
-    }
-
 }
