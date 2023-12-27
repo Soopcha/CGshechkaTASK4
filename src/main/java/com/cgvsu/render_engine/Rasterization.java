@@ -17,11 +17,11 @@ public class Rasterization {
     private double z3;
     private double x3;
     private double y3;
-    private double caff1;
-    private double caff2;
-    private double caff3;
-    private double caff4;
-    private double caff5;
+    private double nom1;
+    private double nom2;
+    private double nom3;
+    private double nom4;
+    private double nom5;
 
     public Rasterization(GraphicsContext graphicsContext, int width, int height) {
         this.graphicsContext = graphicsContext;
@@ -37,8 +37,8 @@ public class Rasterization {
     }
 
     private void paintPoint(int x, int y, Color color) {
-        double alpha = (double) ((x - x3) * caff4 - (y - y3) * caff5) / caff2;
-        double beta = (double) (x - x3) / caff3 - alpha * caff1;
+        double alpha = (double) ((x - x3) * nom4 - (y - y3) * nom5) / nom2;
+        double beta = (double) (x - x3) / nom3 - alpha * nom1;
         double gamma = 1 - alpha - beta;
         double sum = alpha + beta + gamma;
 
@@ -82,11 +82,11 @@ public class Rasterization {
             flag = true;
         }
 
-        caff1 = (x1 - x3) / (x2 - x3);
-        caff2 = ((x1 - x3) * (y2 - y3) - (y1 - y3) * (x2 - x3));
-        caff3 = (x2 - x3);
-        caff4 = (y2 - y3);
-        caff5 = (x2 - x3);
+        nom1 = (x1 - x3) / (x2 - x3);
+        nom2 = ((x1 - x3) * (y2 - y3) - (y1 - y3) * (x2 - x3));
+        nom3 = (x2 - x3);
+        nom4 = (y2 - y3);
+        nom5 = (x2 - x3);
 
 
         if (flag) {
