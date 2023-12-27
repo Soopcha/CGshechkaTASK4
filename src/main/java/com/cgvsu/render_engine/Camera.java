@@ -72,7 +72,7 @@ public class Camera {
         if (isPrimaryButtonDown) {
             rotateCamera((double) (x - mousePosX), (double) (y - mousePosY));
         } else if (isSecondaryButtonDown) {
-            movePosition(new Vector3((float) (x - mousePosX) * 0.1f, (float) (+y - mousePosY) * 0.1f, 0));
+            movePosition(new Vector3((double) (x - mousePosX) * 0.1, (double) (y - mousePosY) * 0.1, 0));
         } else {
             if (mouseDeltaY > 0) {
                 position.subtractThis((position.subtract(target).divide(75)));

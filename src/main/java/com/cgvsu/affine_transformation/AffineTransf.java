@@ -7,7 +7,6 @@ import com.cgvsu.model.Model;
 
 import java.util.ArrayList;
 
-import static com.cgvsu.math.matrix.Matrix4x4.multiplyMatrix4ByVector3;
 
 public class AffineTransf {
 
@@ -146,7 +145,7 @@ public class AffineTransf {
     }
 
     public Vector3 transformVertex(Vector3 v) {
-        return multiplyMatrix4ByVector3(A, v);
+        return VectorMath.mullMatrix4fOnVector3f(A, v);
     }
 
     public Model transformModel(Model m) {
@@ -161,7 +160,11 @@ public class AffineTransf {
         }
 
         for (Vector3 v : m.normals) {
-            rez.normals.add(multiplyMatrix4ByVector3(R,v));
+         //   rez.normals.add(multiplyMatrix4ByVector3(R,v));
+        //    rez.normals.add(VectorMath.mullMatrix4fOnVector3f(R,v));
+
+            Vector3 rotatedNormal = VectorMath.mullMatrix4fOnVector3f(R, v).normalize();
+            rez.normals.add(rotatedNormal);
             //На преобразование нормалей влимяет только матрица поворота
         }
 

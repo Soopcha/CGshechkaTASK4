@@ -219,8 +219,8 @@ public class GuiController {
             }
             updateTransformations();
 
-            // Model transformedMesh = transformedModel.getTransformations().transformModel(mesh);
-            //  RenderEngine.render(canvas.getGraphicsContext2D(), camera, transformedMesh, (int) canvas.getWidth(), (int) canvas.getHeight());
+//             Model transformedMesh = transformedModel.getTransformations().transformModel(mesh);
+//             RenderEngine.render(canvas.getGraphicsContext2D(), camera, transformedMesh, (int) canvas.getWidth(), (int) canvas.getHeight());
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -244,10 +244,9 @@ public class GuiController {
             double translateZValue = Double.parseDouble(translateZ.getText());
 
             AffineTransf updatedTransformations = new AffineTransf(
-                    OrderRotation.XYZ, xScaleValue, yScaleValue, zScaleValue,
+                    OrderRotation.ZYX, xScaleValue, yScaleValue, zScaleValue,
                     xRotate, yRotate, zRotate,
                     translateXValue, translateYValue, translateZValue);
-
             TriangulatedModelWithCorrectNormal triangulatedModelWithCorrectNormal = new TriangulatedModelWithCorrectNormal(mesh);
 
             transformedModel = new TransformedModel(triangulatedModelWithCorrectNormal, updatedTransformations);
