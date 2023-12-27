@@ -1,7 +1,8 @@
-package com.cgvsu.affine_transformation;
+package com.cgvsu.affine_transformation;//package com.cgvsu.affine_transformation;
 
 
 import com.cgvsu.math.matrix.Matrix4x4;
+
 import com.cgvsu.math.vector.Vector3;
 
 public class VectorMath {

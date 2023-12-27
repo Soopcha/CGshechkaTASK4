@@ -7,6 +7,7 @@ import com.cgvsu.model.Model;
 
 import java.util.ArrayList;
 
+
 public class AffineTransf {
 
     //Перечисление отвечающее за порядок поворотов в каждой из плоскостей
@@ -99,56 +100,38 @@ public class AffineTransf {
                 0, 0, 0, 1);
 
         //Матрица афинных преобразований принимается равной единице
-//        A = new Matrix4x4(T);
+
         A = new Matrix4x4(T);
 
 
         //Перемножение матриц поворота согласно их порядку
         switch (or) {
             case ZYX -> {
-//                R.multiply(X);
-//                R.multiply(Y);
-//                R.multiply(Z);
                 R = R.multiply(X);
                 R = R.multiply(Y);
                 R = R.multiply(Z);
             }
             case ZXY -> {
-//                R.multiply(Y);
-//                R.multiply(X);
-//                R.multiply(Z);
                 R = R.multiply(Y);
                 R = R.multiply(X);
                 R = R.multiply(Z);
             }
             case YZX -> {
-//                R.multiply(X);
-//                R.multiply(Z);
-//                R.multiply(Y);
                 R = R.multiply(X);
                 R = R.multiply(Z);
                 R = R.multiply(Y);
             }
             case YXZ -> {
-//                R.multiply(Z);
-//                R.multiply(X);
-//                R.multiply(Y);
                 R = R.multiply(Z);
                 R = R.multiply(X);
                 R = R.multiply(Y);
             }
             case XZY -> {
-//                R.multiply(Y);
-//                R.multiply(Z);
-//                R.multiply(X);
                 R = R.multiply(Y);
                 R = R.multiply(Z);
                 R = R.multiply(X);
             }
             case XYZ -> {
-//                R.multiply(Z);
-//                R.multiply(Y);
-//                R.multiply(X);
                 R = R.multiply(Z);
                 R = R.multiply(Y);
                 R = R.multiply(X);
@@ -177,7 +160,11 @@ public class AffineTransf {
         }
 
         for (Vector3 v : m.normals) {
-            rez.normals.add(VectorMath.mullMatrix4fOnVector3f(R,v));
+         //   rez.normals.add(multiplyMatrix4ByVector3(R,v));
+        //    rez.normals.add(VectorMath.mullMatrix4fOnVector3f(R,v));
+
+            Vector3 rotatedNormal = VectorMath.mullMatrix4fOnVector3f(R, v).normalize();
+            rez.normals.add(rotatedNormal);
             //На преобразование нормалей влимяет только матрица поворота
         }
 
