@@ -7,15 +7,14 @@ import com.cgvsu.model.TransformedModel;
 import com.cgvsu.model.TriangulatedModelWithCorrectNormal;
 import com.cgvsu.objreader.IncorrectFileException;
 import com.cgvsu.objreader.ObjReaderException;
-import com.cgvsu.render_engine.RenderEngine;
+import com.cgvsu.render_engine.*;
 import javafx.fxml.FXML;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.Alert;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
@@ -29,7 +28,6 @@ import com.cgvsu.objwriter.ObjWriter;
 
 import com.cgvsu.model.Model;
 import com.cgvsu.objreader.ObjReader;
-import com.cgvsu.render_engine.Camera;
 
 //import com.cgvsu.model.TransformedTriangulatedModel;
 import com.cgvsu.model.PolygonRemover;
@@ -69,11 +67,15 @@ import com.cgvsu.render_engine.Camera;
 
 import java.util.ArrayList;
 import java.util.List;
-import javafx.scene.control.ComboBox;
+import java.util.Optional;
 
 
 public class GuiController {
+    public TextField newCameraX;
+    public TextField newCameraY;
+    public TextField newCameraZ;
     private TransformedModel transformedModel;
+    private CameraManager cameraManager;
 
     final private float TRANSLATION = 0.5F;
 
@@ -82,6 +84,10 @@ public class GuiController {
 
     @FXML
     private TextField removePolygonsField;
+
+
+
+
 
     private int selectedModelIndex;
 
@@ -124,10 +130,10 @@ public class GuiController {
     public TextField translateZ;
 
 
-    private Camera camera = new Camera(
-            new Vector3(0, 0, 100),
-            new Vector3(0, 0, 0),
-            1.0F, 1, 0.01F, 100);
+//    private Camera camera = new Camera(
+//            new Vector3(0, 0, 100),
+//            new Vector3(0, 0, 0),
+//            1.0F, 1, 0.01F, 100);
 
     private Timeline timeline;
 
@@ -152,6 +158,18 @@ public class GuiController {
         translateY.setText("0");
         translateZ.setText("0");
 
+        Camera camera = new Camera(
+                new Vector3(0, 0, 100),
+                new Vector3(0, 0, 0),
+                1.0F, 1, 0.01F, 100);
+        cameraManager = new CameraManager();
+        cameraManager.addCamera(camera);
+
+
+        addCameraButton.setOnAction(event -> addCamera());
+        removeCameraButton.setOnAction(event -> removeCamera());
+        switchCameraButton.setOnAction(event -> switchCamera());
+
         // Инициализируем список видимости для каждой модели
         for (int i = 0; i < models.size(); i++) {
             modelVisibility.add(true);
@@ -162,16 +180,16 @@ public class GuiController {
             double height = canvas.getHeight();
 
             canvas.getGraphicsContext2D().clearRect(0, 0, width, height);
-            camera.setAspectRatio((float) (width / height));
+            cameraManager.getCurrentCamera().setAspectRatio((float) (width / height));
 
             if (mesh != null) {
 
                 // RenderEngine.render(canvas.getGraphicsContext2D(), camera, mesh, (int) width, (int) height);
-                RenderEngine.render(canvas.getGraphicsContext2D(), camera, transformedModel.getTransformations().transformModel(mesh), (int) width, (int) height);
+                RenderEngine.render(canvas.getGraphicsContext2D(), cameraManager.getCurrentCamera(), transformedModel.getTransformations().transformModel(mesh), (int) width, (int) height);
 
             }
             for (Model model : models) {
-                RenderEngine.render(canvas.getGraphicsContext2D(), camera, model, (int) width, (int) height);
+                RenderEngine.render(canvas.getGraphicsContext2D(), cameraManager.getCurrentCamera(), model, (int) width, (int) height);
             }
 
             renderScene();
@@ -180,11 +198,11 @@ public class GuiController {
 
         timeline.getKeyFrames().add(frame);
         timeline.play();
-        canvas.setOnMouseMoved(event2 -> camera.handleMouseInput(event2.getX(), event2.getY(), false, false));
-        canvas.setOnMouseDragged(event2 -> camera.handleMouseInput(event2.getX(), event2.getY(), event2.isPrimaryButtonDown(), event2.isSecondaryButtonDown()));
+        canvas.setOnMouseMoved(event2 -> cameraManager.getCurrentCamera().handleMouseInput(event2.getX(), event2.getY(), false, false));
+        canvas.setOnMouseDragged(event2 -> cameraManager.getCurrentCamera().handleMouseInput(event2.getX(), event2.getY(), event2.isPrimaryButtonDown(), event2.isSecondaryButtonDown()));
         canvas.setOnScroll(event2 -> {
-            camera.mouseDeltaY = event2.getDeltaY();
-            camera.handleMouseInput(event2.getX(), event2.getY(), false, false);
+            cameraManager.getCurrentCamera().mouseDeltaY = event2.getDeltaY();
+            cameraManager.getCurrentCamera().handleMouseInput(event2.getX(), event2.getY(), false, false);
         });
 
         // Инициализация ComboBox с названиями моделей
@@ -197,6 +215,62 @@ public class GuiController {
         for (Model model : models) {
             modelComboBox.getItems().add(model.modelName);
         }
+    }
+
+    @FXML
+    private
+    void addCamera() {
+        try {
+            double newCameraXValue = Double.parseDouble(newCameraX.getText());
+            double newCameraYValue = Double.parseDouble(newCameraY.getText());
+            double newCameraZValue = Double.parseDouble(newCameraZ.getText());
+
+            Camera newCamera = new Camera(
+                    new Vector3(newCameraXValue, newCameraYValue, newCameraZValue),
+                    new Vector3(0, 0, 0),
+                    1.0F, 1, 0.01F, 100);
+
+            cameraManager.addCamera(newCamera);
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+        }
+    }
+    @FXML
+    private void removeCamera() {
+        List<String> cameraNames = new ArrayList<>();
+        for (int i = 0; i < cameraManager.getNumCameras(); i++) {
+            cameraNames.add("Camera " + (i + 1));
+        }
+
+        ChoiceDialog<String> dialog = new ChoiceDialog<>(cameraNames.get(0), cameraNames);
+        dialog.setTitle("Remove Camera");
+        dialog.setHeaderText("Select the camera to remove:");
+        dialog.setContentText("Camera:");
+
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(cameraName -> {
+            int selectedIndex = cameraNames.indexOf(cameraName);
+            cameraManager.removeCamera(selectedIndex);
+        });
+    }
+
+    @FXML
+    private void switchCamera() {
+        List<String> cameraNames = new ArrayList<>();
+        for (int i = 0; i < cameraManager.getNumCameras(); i++) {
+            cameraNames.add("Camera " + (i + 1));
+        }
+
+        ChoiceDialog<String> dialog = new ChoiceDialog<>(cameraNames.get(0), cameraNames);
+        dialog.setTitle("Switch Camera");
+        dialog.setHeaderText("Select the camera to switch to:");
+        dialog.setContentText("Camera:");
+
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(cameraName -> {
+            int selectedIndex = cameraNames.indexOf(cameraName);
+            cameraManager.switchCamera(selectedIndex);
+        });
     }
 
     @FXML
@@ -298,34 +372,43 @@ public class GuiController {
         String fileName = file.getAbsolutePath();
         ObjWriter.write(fileName, transformedModel.getTransformations().transformModel(mesh));
     }
+
+    @FXML
+    private Button addCameraButton;
+
+    @FXML
+    private Button removeCameraButton;
+
+    @FXML
+    private Button switchCameraButton;
     @FXML
     public void handleCameraForward(ActionEvent actionEvent) {
-        camera.movePosition(new Vector3(0, 0, -TRANSLATION));
+        cameraManager.getCurrentCamera().movePosition(new Vector3(0, 0, -TRANSLATION));
     }
 
     @FXML
     public void handleCameraBackward(ActionEvent actionEvent) {
-        camera.movePosition(new Vector3(0, 0, TRANSLATION));
+        cameraManager.getCurrentCamera().movePosition(new Vector3(0, 0, TRANSLATION));
     }
 
     @FXML
     public void handleCameraLeft(ActionEvent actionEvent) {
-        camera.movePosition(new Vector3(TRANSLATION, 0, 0));
+        cameraManager.getCurrentCamera().movePosition(new Vector3(TRANSLATION, 0, 0));
     }
 
     @FXML
     public void handleCameraRight(ActionEvent actionEvent) {
-        camera.movePosition(new Vector3(-TRANSLATION, 0, 0));
+        cameraManager.getCurrentCamera().movePosition(new Vector3(-TRANSLATION, 0, 0));
     }
 
     @FXML
     public void handleCameraUp(ActionEvent actionEvent) {
-        camera.movePosition(new Vector3(0, TRANSLATION, 0));
+        cameraManager.getCurrentCamera().movePosition(new Vector3(0, TRANSLATION, 0));
     }
 
     @FXML
     public void handleCameraDown(ActionEvent actionEvent) {
-        camera.movePosition(new Vector3(0, -TRANSLATION, 0));
+        cameraManager.getCurrentCamera().movePosition(new Vector3(0, -TRANSLATION, 0));
     }
 
 
@@ -346,7 +429,7 @@ public class GuiController {
 //             Model transformedMesh = transformedModel.getTransformations().transformModel(mesh);
 //             RenderEngine.render(canvas.getGraphicsContext2D(), camera, transformedMesh, (int) canvas.getWidth(), (int) canvas.getHeight());
             Model transformedMesh = transformedModel.getTransformations().transformModel(activeModel);
-            RenderEngine.render(canvas.getGraphicsContext2D(), camera, transformedMesh, (int) canvas.getWidth(), (int) canvas.getHeight());
+            RenderEngine.render(canvas.getGraphicsContext2D(), cameraManager.getCurrentCamera(), transformedMesh, (int) canvas.getWidth(), (int) canvas.getHeight());
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -392,7 +475,7 @@ public class GuiController {
 
             double sensitivity = 0.2;
 
-            camera.movePosition(new Vector3((float) (-deltaX * sensitivity), (float) (deltaY * sensitivity), 0));
+            cameraManager.getCurrentCamera().movePosition(new Vector3((float) (-deltaX * sensitivity), (float) (deltaY * sensitivity), 0));
 
             mouseX = event.getSceneX();
             mouseY = event.getSceneY();
@@ -405,7 +488,7 @@ public class GuiController {
 
 
         double deltaZoom = event.getDeltaY() * sensitivity;
-        camera.movePosition(new Vector3(0, 0, (float) deltaZoom));
+        cameraManager.getCurrentCamera().movePosition(new Vector3(0, 0, (float) deltaZoom));
     }
 
     private void renderActiveModel() {
@@ -413,11 +496,11 @@ public class GuiController {
         double height = canvas.getHeight();
 
         canvas.getGraphicsContext2D().clearRect(0, 0, width, height);
-        camera.setAspectRatio((float) (width / height));
+        cameraManager.getCurrentCamera().setAspectRatio((float) (width / height));
 
         if (activeModelIndex >= 0 && activeModelIndex < models.size()) {
             Model activeModel = models.get(activeModelIndex);
-            RenderEngine.render(canvas.getGraphicsContext2D(), camera, transformedModel.getTransformations().transformModel(activeModel), (int) width, (int) height);
+            RenderEngine.render(canvas.getGraphicsContext2D(), cameraManager.getCurrentCamera(), transformedModel.getTransformations().transformModel(activeModel), (int) width, (int) height);
         }
     }
 
@@ -426,12 +509,12 @@ public class GuiController {
         double height = canvas.getHeight();
 
         canvas.getGraphicsContext2D().clearRect(0, 0, width, height);
-        camera.setAspectRatio((float) (width / height));
+        cameraManager.getCurrentCamera().setAspectRatio((float) (width / height));
 
         for (int i = 0; i < models.size(); i++) {
             if (modelVisibility.get(i)) {
                 Model model = models.get(i);
-                RenderEngine.render(canvas.getGraphicsContext2D(), camera, model, (int) width, (int) height);
+                RenderEngine.render(canvas.getGraphicsContext2D(), cameraManager.getCurrentCamera(), model, (int) width, (int) height);
             }
         }
     }
