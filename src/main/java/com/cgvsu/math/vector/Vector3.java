@@ -48,6 +48,11 @@ public class Vector3 {
         double newZ = this.z + other.z;
         return new Vector3(newX, newY, newZ);
     }
+    public final void addThis(Vector3 other1) {
+        this.x += other1.x;
+        this.y += other1.y;
+        this.z += other1.z;
+    }
 
     // Операция вычитания векторов
     public Vector3 subtract(Vector3 other) {
@@ -56,6 +61,12 @@ public class Vector3 {
         double newZ = this.z - other.z;
         return new Vector3(newX, newY, newZ);
     }
+    public final void subtractThis(Vector3 other1) {
+        this.x -= other1.x;
+        this.y -= other1.y;
+        this.z -= other1.z;
+    }
+
 
     // Операция умножения вектора на скаляр
     public Vector3 multiply(double scalar) {
@@ -93,11 +104,18 @@ public class Vector3 {
     }
 
     // Векторное произведение векторов
-    public Vector3 crossProduct(Vector3 other) {
+    public Vector3 cross(Vector3 other) {
         double newX = this.y * other.z - this.z * other.y;
         double newY = this.z * other.x - this.x * other.z;
         double newZ = this.x * other.y - this.y * other.x;
         return new Vector3(newX, newY, newZ);
+    }
+    public final void crossProduct(Vector3 other1, Vector3 other2) {
+        double v1 = other1.y * other2.z - other1.z * other2.y;
+        double v2 = other1.z * other2.x - other1.x * other2.z;
+        this.z = other1.x * other2.y - other1.y * other2.x;
+        this.x = v1;
+        this.y = v2;
     }
 
 
@@ -178,6 +196,29 @@ public class Vector3 {
                 ", y=" + y +
                 ", z=" + z +
                 '}';
+    }
+    public double get(int index) {
+        switch (index) {
+            case 0:
+                return x;
+            case 1:
+                return y;
+            case 2:
+                return z;
+        }
+        throw new IllegalArgumentException("Индекс выходит за границы");
+    }
+
+    //    public static Vector2 vertexToPoint1(final Vector3 vertex, final int width, final int height) {
+//        return new Vector2((float) vertex.get(0) * width + width / 2.0F, (float) -vertex.get(1) * height + height / 2.0F);
+//    }
+    public final void subtract(Vector3 other1, Vector3 other2) {
+        this.x = other1.x - other2.x;
+        this.y = other1.y - other2.y;
+        this.z = other1.z - other2.z;
+    }
+    public static Vector2 vertexToPoint(final Vector3 vertex, final int width, final int height) {
+        return new Vector2((double) vertex.get(0) * width + width / 2.0F, (double) -vertex.get(1) * height + height / 2.0F);
     }
 
 }
