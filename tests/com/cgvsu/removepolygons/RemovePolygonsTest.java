@@ -116,4 +116,19 @@ public class RemovePolygonsTest {
         assertEquals(0, model.polygons.size());
 
     }
+    @Test
+    public void testRemovePolygonsFromHand() throws IOException, IncorrectFileException {
+        Path fileName = Path.of("C:/Users/anyad/IdeaProjects/CGtask3-master/3DModels/Faceform/WrapHand.obj");
+        String fileContent = Files.readString(fileName);
+        Model model = ObjReader.read(fileContent);
+
+        ArrayList<Integer> polygonsToRemove = new ArrayList<>();
+        polygonsToRemove.add(1);
+        removePolygons(model, polygonsToRemove, false);
+
+        assertEquals(4057, model.vertices.size());
+        assertEquals(4040, model.polygons.size());
+
+    }
+
 }

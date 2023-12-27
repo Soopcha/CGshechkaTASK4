@@ -1,6 +1,7 @@
 package com.cgvsu.model;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 public class PolygonRemover {
 
@@ -11,18 +12,15 @@ public class PolygonRemover {
         }
     }
  //удаление полигонов из модели
-    private static void removeSelectedPolygons(Model model, ArrayList<Integer> polygonIndices) {
-        Iterator<Polygon> iterator = model.polygons.iterator();
-        int currentIndex = 0;
+ public static void removeSelectedPolygons(Model model, ArrayList<Integer> polygonIndices) {
+     List<Polygon> polygonsCopy = new ArrayList<>(model.polygons);
 
-        while (iterator.hasNext()) {
-            iterator.next();
-            if (polygonIndices.contains(currentIndex)) {
-                iterator.remove();
-            }
-            currentIndex++;
-        }
-    }
+     for (Integer index : polygonIndices) {
+         if (index >= 0 && index < polygonsCopy.size()) {
+             model.polygons.remove(polygonsCopy.get(index));
+         }
+     }
+ }
 
 //удаление свободных вершин из модели
     private static void removeFreeVertices(Model model) {
