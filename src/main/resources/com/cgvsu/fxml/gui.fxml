@@ -115,7 +115,11 @@
                             <Text text="Z:"/>
                             <TextField fx:id="translateZ"/>
                         </HBox>
-
+                        <Text text="Remove Vertices:"/>
+                        <TextField fx:id="removeVerticesField"/>
+                        <Text text="Remove Polygons:"/>
+                        <TextField fx:id="removePolygonsField"/>
+                        <Button onAction="#onRemoveButtonClick" text="Remove"/>
                         <Button onAction="#onTransformButtonClick" text="Transform Model"/>
                     </VBox>
                 </content>

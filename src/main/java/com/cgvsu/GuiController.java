@@ -1,6 +1,8 @@
 package com.cgvsu;
 
 //import com.cgvsu.model.TransformedTriangulatedModel;
+import com.cgvsu.model.PolygonRemover;
+import com.cgvsu.model.RemoveVertices;
 import com.cgvsu.affine_transformation.AffineTransf;
 import com.cgvsu.affine_transformation.OrderRotation;
 import com.cgvsu.model.TransformedModel;
@@ -65,6 +67,12 @@ import javafx.scene.control.ComboBox;
 
 
 public class GuiController {
+
+    @FXML
+    private TextField removeVerticesField;
+
+    @FXML
+    private TextField removePolygonsField;
     public TransformedModel transformedModel;
 
     private int selectedModelIndex = 0;
@@ -478,6 +486,49 @@ public class GuiController {
             renderActiveModel();
         } else {
             renderAllModels();
+        }
+    }
+
+    @FXML
+    private void onRemoveButtonClick() {
+        try {
+            if (mesh == null) {
+                // Show warning if no model is loaded
+                // (You can customize this based on your UI design)
+                return;
+            }
+
+            String verticesInput = removeVerticesField.getText().trim();
+            String polygonsInput = removePolygonsField.getText().trim();
+
+            if (!verticesInput.isEmpty()) {
+                // Remove vertices if the vertices field is not empty
+                String[] indicesString = verticesInput.split(",");
+                ArrayList<Integer> verticesToRemove = new ArrayList<>();
+                for (String indexStr : indicesString) {
+                    verticesToRemove.add(Integer.parseInt(indexStr.trim()));
+                }
+                RemoveVertices.removeVertices(mesh, verticesToRemove);
+            }
+
+            if (!polygonsInput.isEmpty()) {
+                // Remove polygons if the polygons field is not empty
+                String[] indicesString = polygonsInput.split(",");
+                ArrayList<Integer> polygonsToRemove = new ArrayList<>();
+                for (String indexStr : indicesString) {
+                    polygonsToRemove.add(Integer.parseInt(indexStr.trim()));
+                }
+                PolygonRemover.removeSelectedPolygons(mesh, polygonsToRemove);
+            }
+
+            // Update the transformed model if needed
+            if (transformedModel != null) {
+                transformedModel = new TransformedModel(new TriangulatedModelWithCorrectNormal(mesh), transformedModel.getTransformations());
+            }
+
+        } catch (NumberFormatException | IndexOutOfBoundsException | NullPointerException e) {
+            // Handle the exception (e.g., show an error message)
+            e.printStackTrace();
         }
     }
 }
