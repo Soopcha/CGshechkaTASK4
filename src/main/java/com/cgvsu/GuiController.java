@@ -493,8 +493,6 @@ public class GuiController {
     private void onRemoveButtonClick() {
         try {
             if (mesh == null) {
-                // Show warning if no model is loaded
-                // (You can customize this based on your UI design)
                 return;
             }
 
@@ -502,7 +500,6 @@ public class GuiController {
             String polygonsInput = removePolygonsField.getText().trim();
 
             if (!verticesInput.isEmpty()) {
-                // Remove vertices if the vertices field is not empty
                 String[] indicesString = verticesInput.split(",");
                 ArrayList<Integer> verticesToRemove = new ArrayList<>();
                 for (String indexStr : indicesString) {
@@ -512,7 +509,6 @@ public class GuiController {
             }
 
             if (!polygonsInput.isEmpty()) {
-                // Remove polygons if the polygons field is not empty
                 String[] indicesString = polygonsInput.split(",");
                 ArrayList<Integer> polygonsToRemove = new ArrayList<>();
                 for (String indexStr : indicesString) {
@@ -521,13 +517,11 @@ public class GuiController {
                 PolygonRemover.removeSelectedPolygons(mesh, polygonsToRemove);
             }
 
-            // Update the transformed model if needed
             if (transformedModel != null) {
                 transformedModel = new TransformedModel(new TriangulatedModelWithCorrectNormal(mesh), transformedModel.getTransformations());
             }
 
         } catch (NumberFormatException | IndexOutOfBoundsException | NullPointerException e) {
-            // Handle the exception (e.g., show an error message)
             e.printStackTrace();
         }
     }
