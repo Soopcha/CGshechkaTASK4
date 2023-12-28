@@ -128,15 +128,15 @@ public class GuiController {
     public TextField translateY;
     @FXML
     public TextField translateZ;
-
-
-//    private Camera camera = new Camera(
-//            new Vector3(0, 0, 100),
-//            new Vector3(0, 0, 0),
-//            1.0F, 1, 0.01F, 100);
-
     private Timeline timeline;
+    @FXML
+    private Button addCameraButton;
 
+    @FXML
+    private Button removeCameraButton;
+
+    @FXML
+    private Button switchCameraButton;
 
 
     @FXML
@@ -350,18 +350,25 @@ public class GuiController {
             mesh = ObjReader.read(fileContent);
             TriangulatedModelWithCorrectNormal triangulatedModelWithCorrectNormal = new TriangulatedModelWithCorrectNormal(mesh);
             transformedModel = new TransformedModel(triangulatedModelWithCorrectNormal, new AffineTransf());
+            //Model model = ObjReader.read(fileContent);
             transformedModel.getTriangulatedModel().getInitialModel().modelName = objName;
             models.add(transformedModel.getTriangulatedModel().getInitialModel());
 
+
+            //models.add(model);
+            //models.add(transformedModel.getTriangulatedModel().getInitialModel());
+
+
+
             updateModelComboBox();
         } catch (IOException exception) {
-            // Ошибка при чтении файла. Вывести окно с сообщением об ошибке.
+            // Ошибка при чтении файла.
             showErrorAlert("Error Reading File", "An error occurred while reading the file.");
         } catch (ObjReaderException objReaderException) {
-            // Ошибка разбора файла OBJ. Вывести окно с сообщением об ошибке.
+            // Ошибка разбора файла OBJ.
             showErrorAlert("Error Parsing OBJ File", objReaderException.getMessage());
         } catch (IncorrectFileException incorrectFileException) {
-            // Ошибка формата файла. Вывести окно с сообщением об ошибке.
+            // Ошибка формата файла.
             showErrorAlert("Incorrect File Format", incorrectFileException.getMessage());
         }
     }
@@ -383,7 +390,6 @@ public class GuiController {
         });
     }
 
-
     @FXML
     private void onSaveModelMenuItemClick() {
         if (!models.isEmpty()) {
@@ -401,13 +407,7 @@ public class GuiController {
         }
     }
 
-    public Model getActiveModel() {
-        if (activeModelIndex >= 0 && activeModelIndex < models.size()) {
-            return transformedModel.getTransformations().transformModel(models.get(activeModelIndex));
-        } else {
-            return null; // Индекс за пределами массива
-        }
-    }
+
 
     @FXML
     private void onSaveTransformedModelButtonClick() {
@@ -424,14 +424,7 @@ public class GuiController {
         ObjWriter.write(fileName, transformedModel.getTransformations().transformModel(mesh));
     }
 
-    @FXML
-    private Button addCameraButton;
 
-    @FXML
-    private Button removeCameraButton;
-
-    @FXML
-    private Button switchCameraButton;
     @FXML
     public void handleCameraForward(ActionEvent actionEvent) {
         cameraManager.getCurrentCamera().movePosition(new Vector3(0, 0, -TRANSLATION));
@@ -504,7 +497,7 @@ public class GuiController {
             double translateZValue = Double.parseDouble(translateZ.getText());
 
             AffineTransf updatedTransformations = new AffineTransf(
-                    OrderRotation.ZYX, xScaleValue, yScaleValue, zScaleValue,
+                    OrderRotation.XYZ, xScaleValue, yScaleValue, zScaleValue,
                     xRotate, yRotate, zRotate,
                     translateXValue, translateYValue, translateZValue);
             TriangulatedModelWithCorrectNormal triangulatedModelWithCorrectNormal = new TriangulatedModelWithCorrectNormal(getActiveModel());
@@ -516,32 +509,14 @@ public class GuiController {
             e.printStackTrace();
         }
     }
-    private void handleMouseEvents(MouseEvent event) {
-        if (event.getEventType() == MouseEvent.MOUSE_PRESSED) {
-            mouseX = event.getSceneX();
-            mouseY = event.getSceneY();
-        } else if (event.getEventType() == MouseEvent.MOUSE_DRAGGED) {
-            double deltaX = event.getSceneX() - mouseX;
-            double deltaY = event.getSceneY() - mouseY;
 
-            double sensitivity = 0.2;
-
-            cameraManager.getCurrentCamera().movePosition(new Vector3((float) (-deltaX * sensitivity), (float) (deltaY * sensitivity), 0));
-
-            mouseX = event.getSceneX();
-            mouseY = event.getSceneY();
+    public Model getActiveModel() {
+        if (activeModelIndex >= 0 && activeModelIndex < models.size()) {
+            return transformedModel.getTransformations().transformModel(models.get(activeModelIndex));
+        } else {
+            return null; // Индекс за пределами массива
         }
     }
-
-    private void handleScrollEvent(ScrollEvent event) {
-
-        double sensitivity = 0.1;
-
-
-        double deltaZoom = event.getDeltaY() * sensitivity;
-        cameraManager.getCurrentCamera().movePosition(new Vector3(0, 0, (float) deltaZoom));
-    }
-
     private void renderActiveModel() {
         double width = canvas.getWidth();
         double height = canvas.getHeight();
