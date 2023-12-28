@@ -300,6 +300,35 @@ public class GuiController {
         TriangulatedModelWithCorrectNormal triangulatedModelWithCorrectNormal = new TriangulatedModelWithCorrectNormal(getActiveModel());
 
         transformedModel = new TransformedModel(triangulatedModelWithCorrectNormal, zeroTransformations);
+        xRotateField.setText("0");
+        yRotateField.setText("0");
+        zRotateField.setText("0");
+
+        xScale.setText("1");
+        yScale.setText("1");
+        zScale.setText("1");
+
+        translateX.setText("0");
+        translateY.setText("0");
+        translateZ.setText("0");
+    }
+    @FXML
+    private void onResetTransformButtonClick() {
+        try {
+            if (getActiveModel() == null) {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Warning");
+                alert.setHeaderText("No Model Loaded");
+                alert.setContentText("Please load a model before applying transformations.");
+                alert.showAndWait();
+                return;
+            }
+            resetTransformations();
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML

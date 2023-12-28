@@ -123,6 +123,7 @@
                         <TextField fx:id="removePolygonsField"/>
                         <Button onAction="#onRemoveButtonClick" text="Remove"/>
                         <Button onAction="#onTransformButtonClick" text="Transform Model"/>
+                        <Button onAction="#onResetTransformButtonClick" text="Reset Transformations"/>
                     </VBox>
                 </content>
             </CustomMenuItem>
