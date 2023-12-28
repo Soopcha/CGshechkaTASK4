@@ -517,6 +517,7 @@ public class GuiController {
             return null; // Индекс за пределами массива
         }
     }
+
     private void renderActiveModel() {
         double width = canvas.getWidth();
         double height = canvas.getHeight();
