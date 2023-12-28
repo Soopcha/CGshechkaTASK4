@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.cgvsu.math.vector.Vector3;
+import com.cgvsu.math.vector.Vector4;
 import com.cgvsu.model.Polygon;
 import javafx.scene.canvas.GraphicsContext;
 
@@ -90,6 +91,8 @@ public class RenderEngine {
 
                 Vector3 projectedPoint = multiplyMatrix4ByVector3(modelViewProjectionMatrix,vertexVecmath);
                 Point2d screenPoint = vertexToPoint(projectedPoint,width,height);
+
+
                 polygonVertices.add(new Vector3(screenPoint.x, screenPoint.y, projectedPoint.getZ()));
             }
 
@@ -97,6 +100,7 @@ public class RenderEngine {
             rasterizeTriangle(graphicsContext, polygonVertices, width, height, fillColor,zBuffer);
         }
     }
+
 
     private static void rasterizeTriangle(
             final GraphicsContext graphicsContext,
@@ -106,32 +110,35 @@ public class RenderEngine {
             final Color fillColor,
             double[][] zBuffer
     ) {
-        // Получаем координаты вершин треугольника
-        double x1 = triangleVertices.get(0).getX();
-        double y1 = triangleVertices.get(0).getY();
-        double x2 = triangleVertices.get(1).getX();
-        double y2 = triangleVertices.get(1).getY();
-        double x3 = triangleVertices.get(2).getX();
-        double y3 = triangleVertices.get(2).getY();
+        // Получаем целочисленные координаты вершин треугольника
+        int x1 = (int) triangleVertices.get(0).getX();
+        int y1 = (int) triangleVertices.get(0).getY();
+        int x2 = (int) triangleVertices.get(1).getX();
+        int y2 = (int) triangleVertices.get(1).getY();
+        int x3 = (int) triangleVertices.get(2).getX();
+        int y3 = (int) triangleVertices.get(2).getY();
 
         // Находим ограничивающий прямоугольник
-        double minX = Math.max(0, Math.min(x1, Math.min(x2, x3)));
-        double minY = Math.max(0, Math.min(y1, Math.min(y2, y3)));
-        double maxX = Math.min(width, Math.max(x1, Math.max(x2, x3)));
-        double maxY = Math.min(height, Math.max(y1, Math.max(y2, y3)));
+        int minX = Math.max(0, Math.min(x1, Math.min(x2, x3)));
+        int minY = Math.max(0, Math.min(y1, Math.min(y2, y3)));
+        int maxX = Math.min(width, Math.max(x1, Math.max(x2, x3)));
+        int maxY = Math.min(height, Math.max(y1, Math.max(y2, y3)));
+
+        // Предварительно вычисляем штуку но мб это не верно
+        double detT = (y2 - y3) * (x1 - x3) + (x3 - x2) * (y1 - y3);
 
         // Используем алгоритм барицентрических координат для определения принадлежности точек треугольнику
-        for (double x = minX; x <= maxX; x++) {
-            for (double y = minY; y <= maxY; y++) {
+        for (int x = minX; x <= maxX; x++) {
+            for (int y = minY; y <= maxY; y++) {
                 double b1 = barycentricCoordinate(
                         x2, y2, x3, y3,
-                        x1, y1, x, y);
+                        x1, y1, x, y,detT);
                 double b2 = barycentricCoordinate(
                         x3, y3, x1, y1,
-                        x2, y2, x, y);
+                        x2, y2, x, y,detT);
                 double b3 = barycentricCoordinate(
                         x1, y1, x2, y2,
-                        x3, y3, x, y);
+                        x3, y3, x, y,detT);
 
                 if (b1 >= 0 && b2 >= 0 && b3 >= 0) {
                     // Точка (x, y) находится внутри треугольника
@@ -161,9 +168,9 @@ public class RenderEngine {
             double x1, double y1,
             double x2, double y2,
             double x3, double y3,
-            double x, double y) {
+            double x, double y, double detT) {
         // Calculate the barycentric coordinates
-        double detT = (y2 - y3) * (x1 - x3) + (x3 - x2) * (y1 - y3);
+//        double detT = (y2 - y3) * (x1 - x3) + (x3 - x2) * (y1 - y3);
         double lambda1 = ((y2 - y3) * (x - x3) + (x3 - x2) * (y - y3)) / detT;
         double lambda2 = ((y3 - y1) * (x - x3) + (x1 - x3) * (y - y3)) / detT;
         double lambda3 = 1 - lambda1 - lambda2;

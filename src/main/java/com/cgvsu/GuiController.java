@@ -3,11 +3,12 @@ package com.cgvsu;
 //import com.cgvsu.model.TransformedTriangulatedModel;
 import com.cgvsu.affine_transformation.AffineTransf;
 import com.cgvsu.affine_transformation.OrderRotation;
+import com.cgvsu.model.Polygon;
 import com.cgvsu.model.TransformedModel;
 import com.cgvsu.model.TriangulatedModelWithCorrectNormal;
 import com.cgvsu.objreader.IncorrectFileException;
-import com.cgvsu.objreader.ObjReaderException;
 import com.cgvsu.render_engine.RenderEngine;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
@@ -16,7 +17,6 @@ import javafx.event.ActionEvent;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
@@ -27,6 +27,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.io.IOException;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import javax.vecmath.Vector3f;
 import com.cgvsu.objwriter.ObjWriter;
 
@@ -106,7 +112,7 @@ public class GuiController {
 
 
 
-        KeyFrame frame = new KeyFrame(Duration.millis(20), event -> {
+        KeyFrame frame = new KeyFrame(Duration.millis(15), event -> {
             double width = canvas.getWidth();
             double height = canvas.getHeight();
             clearZBuffer();
@@ -115,11 +121,10 @@ public class GuiController {
             camera.setAspectRatio((float) (width / height));
 
             if (mesh != null) {
-
-                // RenderEngine.render(canvas.getGraphicsContext2D(), camera, mesh, (int) width, (int) height);
                 RenderEngine.render(canvas.getGraphicsContext2D(), camera, transformedModel.getTransformations().transformModel(mesh), (int) width, (int) height,zBuffer);
 
             }
+
         });
 
 
