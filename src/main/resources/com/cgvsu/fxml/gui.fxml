@@ -160,7 +160,6 @@
     <ComboBox fx:id="modelComboBox" onAction="#handleModelSelection" promptText="Select model"
               AnchorPane.topAnchor="0.0" AnchorPane.rightAnchor="0.0">
         <items>
-            <!-- Здесь будет динамически добавляться список моделей -->
         </items>
     </ComboBox>
 
