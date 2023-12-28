@@ -564,7 +564,7 @@ public class GuiController {
     @FXML
     private void onRemoveButtonClick() {
         try {
-            if (mesh == null) {
+            if (getActiveModel() == null) {
                 return;
             }
 
@@ -577,7 +577,7 @@ public class GuiController {
                 for (String indexStr : indicesString) {
                     verticesToRemove.add(Integer.parseInt(indexStr.trim()));
                 }
-                RemoveVertices.removeVertices(mesh, verticesToRemove);
+                RemoveVertices.removeVertices(getActiveModel(), verticesToRemove);
             }
 
             if (!polygonsInput.isEmpty()) {
@@ -586,11 +586,11 @@ public class GuiController {
                 for (String indexStr : indicesString) {
                     polygonsToRemove.add(Integer.parseInt(indexStr.trim()));
                 }
-                PolygonRemover.removeSelectedPolygons(mesh, polygonsToRemove);
+                PolygonRemover.removeSelectedPolygons(getActiveModel(), polygonsToRemove);
             }
 
             if (transformedModel != null) {
-                transformedModel = new TransformedModel(new TriangulatedModelWithCorrectNormal(mesh), transformedModel.getTransformations());
+                transformedModel = new TransformedModel(new TriangulatedModelWithCorrectNormal(getActiveModel()), transformedModel.getTransformations());
             }
 
         } catch (NumberFormatException | IndexOutOfBoundsException | NullPointerException e) {
