@@ -318,7 +318,6 @@ public class GuiController {
             //models.add(transformedModel.getTriangulatedModel().getInitialModel());
 
 
-
             updateModelComboBox();
         } catch (IOException exception) {
             // Ошибка при чтении файла.
