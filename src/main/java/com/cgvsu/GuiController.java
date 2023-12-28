@@ -307,17 +307,15 @@ public class GuiController {
         try {
             String fileContent = Files.readString(fileName);
             String objName = String.valueOf(fileName.getFileName());
-            mesh = ObjReader.read(fileContent);
-            TriangulatedModelWithCorrectNormal triangulatedModelWithCorrectNormal = new TriangulatedModelWithCorrectNormal(mesh);
+            Model model = ObjReader.read(fileContent);
+            TriangulatedModelWithCorrectNormal triangulatedModelWithCorrectNormal = new TriangulatedModelWithCorrectNormal(model);
             transformedModel = new TransformedModel(triangulatedModelWithCorrectNormal, new AffineTransf());
-            //Model model = ObjReader.read(fileContent);
             transformedModel.getTriangulatedModel().getInitialModel().modelName = objName;
             models.add(transformedModel.getTriangulatedModel().getInitialModel());
 
 
             //models.add(model);
             //models.add(transformedModel.getTriangulatedModel().getInitialModel());
-
 
 
             updateModelComboBox();
@@ -380,7 +378,7 @@ public class GuiController {
         }
 
         String fileName = file.getAbsolutePath();
-        ObjWriter.write(fileName, transformedModel.getTransformations().transformModel(getActiveModel()));
+        ObjWriter.write(fileName, getActiveModel());
     }
 
 
