@@ -360,11 +360,34 @@ public class GuiController {
 
 
 
-            // todo: обработка ошибок
             updateModelComboBox();
         } catch (IOException exception) {
-
+            // Ошибка при чтении файла.
+            showErrorAlert("Error Reading File", "An error occurred while reading the file.");
+        } catch (ObjReaderException objReaderException) {
+            // Ошибка разбора файла OBJ.
+            showErrorAlert("Error Parsing OBJ File", objReaderException.getMessage());
+        } catch (IncorrectFileException incorrectFileException) {
+            // Ошибка формата файла.
+            showErrorAlert("Incorrect File Format", incorrectFileException.getMessage());
         }
+    }
+
+    private void showErrorAlert(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+
+        ButtonType okButton = new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE);
+        alert.getButtonTypes().setAll(okButton);
+
+        // Обработчик события для кнопки "Ок"
+        alert.showAndWait().ifPresent(response -> {
+            if (response == okButton) {
+                // Действия после нажатия кнопки "Ок", если необходимо
+            }
+        });
     }
 
     @FXML
@@ -494,6 +517,7 @@ public class GuiController {
             return null; // Индекс за пределами массива
         }
     }
+
     private void renderActiveModel() {
         double width = canvas.getWidth();
         double height = canvas.getHeight();
