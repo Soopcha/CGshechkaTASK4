@@ -128,15 +128,15 @@ public class GuiController {
     public TextField translateY;
     @FXML
     public TextField translateZ;
-
-
-//    private Camera camera = new Camera(
-//            new Vector3(0, 0, 100),
-//            new Vector3(0, 0, 0),
-//            1.0F, 1, 0.01F, 100);
-
     private Timeline timeline;
+    @FXML
+    private Button addCameraButton;
 
+    @FXML
+    private Button removeCameraButton;
+
+    @FXML
+    private Button switchCameraButton;
 
 
     @FXML
@@ -384,13 +384,7 @@ public class GuiController {
         }
     }
 
-    public Model getActiveModel() {
-        if (activeModelIndex >= 0 && activeModelIndex < models.size()) {
-            return transformedModel.getTransformations().transformModel(models.get(activeModelIndex));
-        } else {
-            return null; // Индекс за пределами массива
-        }
-    }
+
 
     @FXML
     private void onSaveTransformedModelButtonClick() {
@@ -407,14 +401,7 @@ public class GuiController {
         ObjWriter.write(fileName, transformedModel.getTransformations().transformModel(mesh));
     }
 
-    @FXML
-    private Button addCameraButton;
 
-    @FXML
-    private Button removeCameraButton;
-
-    @FXML
-    private Button switchCameraButton;
     @FXML
     public void handleCameraForward(ActionEvent actionEvent) {
         cameraManager.getCurrentCamera().movePosition(new Vector3(0, 0, -TRANSLATION));
@@ -487,7 +474,7 @@ public class GuiController {
             double translateZValue = Double.parseDouble(translateZ.getText());
 
             AffineTransf updatedTransformations = new AffineTransf(
-                    OrderRotation.ZYX, xScaleValue, yScaleValue, zScaleValue,
+                    OrderRotation.XYZ, xScaleValue, yScaleValue, zScaleValue,
                     xRotate, yRotate, zRotate,
                     translateXValue, translateYValue, translateZValue);
             TriangulatedModelWithCorrectNormal triangulatedModelWithCorrectNormal = new TriangulatedModelWithCorrectNormal(getActiveModel());
@@ -499,32 +486,14 @@ public class GuiController {
             e.printStackTrace();
         }
     }
-    private void handleMouseEvents(MouseEvent event) {
-        if (event.getEventType() == MouseEvent.MOUSE_PRESSED) {
-            mouseX = event.getSceneX();
-            mouseY = event.getSceneY();
-        } else if (event.getEventType() == MouseEvent.MOUSE_DRAGGED) {
-            double deltaX = event.getSceneX() - mouseX;
-            double deltaY = event.getSceneY() - mouseY;
 
-            double sensitivity = 0.2;
-
-            cameraManager.getCurrentCamera().movePosition(new Vector3((float) (-deltaX * sensitivity), (float) (deltaY * sensitivity), 0));
-
-            mouseX = event.getSceneX();
-            mouseY = event.getSceneY();
+    public Model getActiveModel() {
+        if (activeModelIndex >= 0 && activeModelIndex < models.size()) {
+            return transformedModel.getTransformations().transformModel(models.get(activeModelIndex));
+        } else {
+            return null; // Индекс за пределами массива
         }
     }
-
-    private void handleScrollEvent(ScrollEvent event) {
-
-        double sensitivity = 0.1;
-
-
-        double deltaZoom = event.getDeltaY() * sensitivity;
-        cameraManager.getCurrentCamera().movePosition(new Vector3(0, 0, (float) deltaZoom));
-    }
-
     private void renderActiveModel() {
         double width = canvas.getWidth();
         double height = canvas.getHeight();
