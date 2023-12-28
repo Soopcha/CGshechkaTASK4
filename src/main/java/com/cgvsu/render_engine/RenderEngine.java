@@ -15,11 +15,6 @@ import javafx.scene.paint.Color;
 import static com.cgvsu.render_engine.GraphicConveyor.*;
 
 public class RenderEngine {
-//    private static double[][] zBuffer; // Добавьте это
-//
-//    public static void setZBuffer(double[][] buffer) {
-//        zBuffer = buffer;
-//    }
 
     public static void render(
             final GraphicsContext graphicsContext,
@@ -73,7 +68,8 @@ public class RenderEngine {
                     (int) width,
                     (int) height,
                     Color.RED,
-                    zBuffer);
+                    zBuffer,
+                    modelViewProjectionMatrix);
 //                graphicsContext.strokeLine(
 //                        resultPoints.get(nVerticesInPolygon - 1).x,
 //                        resultPoints.get(nVerticesInPolygon - 1).y,
@@ -82,17 +78,7 @@ public class RenderEngine {
         }
     }
 
-    private static void fillPolygons(GraphicsContext graphicsContext, Camera camera, Model mesh, int width, int height, Color fillColor, double[][] zBuffer) {
-        // Получаем матрицы преобразования
-
-        Matrix4f modelMatrix = rotateScaleTranslate();
-        Matrix4f viewMatrix = camera.getViewMatrix();
-        Matrix4f projectionMatrix = camera.getProjectionMatrix();
-
-        // Вычисляем конечную матрицу модели-вида-проекции
-        Matrix4f modelViewProjectionMatrix = new Matrix4f(modelMatrix);
-        modelViewProjectionMatrix.mul(viewMatrix);
-        modelViewProjectionMatrix.mul(projectionMatrix);
+    private static void fillPolygons(GraphicsContext graphicsContext, Camera camera, Model mesh, int width, int height, Color fillColor, double[][] zBuffer,Matrix4f modelViewProjectionMatrix) {
 
         // Проходим по всем полигонам модели
         for (Polygon polygon : mesh.getPolygons()) {
@@ -101,7 +87,10 @@ public class RenderEngine {
             for (int vertexIndex : polygon.getVertexIndices()) {
                 Vector3 vertex = mesh.getVertices().get(vertexIndex);
                 Vector3 vertexVecmath = new Vector3(vertex.getX(), vertex.getY(), vertex.getZ());
-                polygonVertices.add(multiplyMatrix4ByVector3(modelViewProjectionMatrix, vertexVecmath));
+
+                Vector3 projectedPoint = multiplyMatrix4ByVector3(modelViewProjectionMatrix,vertexVecmath);
+                Point2d screenPoint = vertexToPoint(projectedPoint,width,height);
+                polygonVertices.add(new Vector3(screenPoint.x, screenPoint.y, projectedPoint.getZ()));
             }
 
             // Растеризация треугольника
@@ -134,18 +123,15 @@ public class RenderEngine {
         // Используем алгоритм барицентрических координат для определения принадлежности точек треугольнику
         for (double x = minX; x <= maxX; x++) {
             for (double y = minY; y <= maxY; y++) {
-//                double b1 = barycentricCoordinate(x2, y2, x3, y3, x, y) / barycentricCoordinate(x2, y2, x3, y3, x1, y1);
-//                double b2 = barycentricCoordinate(x3, y3, x1, y1, x, y) / barycentricCoordinate(x3, y3, x1, y1, x2, y2);
-//                double b3 = barycentricCoordinate(x1, y1, x2, y2, x, y) / barycentricCoordinate(x1, y1, x2, y2, x3, y3);
                 double b1 = barycentricCoordinate(
                         x2, y2, x3, y3,
-                        x, y, x1, y1);
+                        x1, y1, x, y);
                 double b2 = barycentricCoordinate(
                         x3, y3, x1, y1,
-                        x, y, x2, y2);
+                        x2, y2, x, y);
                 double b3 = barycentricCoordinate(
                         x1, y1, x2, y2,
-                        x, y, x3, y3);
+                        x3, y3, x, y);
 
                 if (b1 >= 0 && b2 >= 0 && b3 >= 0) {
                     // Точка (x, y) находится внутри треугольника
@@ -176,8 +162,30 @@ public class RenderEngine {
             double x2, double y2,
             double x3, double y3,
             double x, double y) {
-        return ((y2 - y3) * (x - x3) + (x3 - x2) * (y - y3)) /
-                ((y2 - y3) * (x1 - x3) + (x3 - x2) * (y1 - y3));
+        // Calculate the barycentric coordinates
+        double detT = (y2 - y3) * (x1 - x3) + (x3 - x2) * (y1 - y3);
+        double lambda1 = ((y2 - y3) * (x - x3) + (x3 - x2) * (y - y3)) / detT;
+        double lambda2 = ((y3 - y1) * (x - x3) + (x1 - x3) * (y - y3)) / detT;
+        double lambda3 = 1 - lambda1 - lambda2;
+
+        // Check if the point is inside the triangle
+        if (lambda1 >= 0 && lambda1 <= 1 && lambda2 >= 0 && lambda2 <= 1 && lambda3 >= 0 && lambda3 <= 1) {
+            // Point is inside the triangle
+            return lambda1;
+        } else {
+            // Point is outside the triangle
+            return -1;
+        }
     }
 }
+//    private static double barycentricCoordinate(
+//            double x1, double y1,
+//            double x2, double y2,
+//            double x3, double y3,
+//            double x, double y) {
+//        return ((y2 - y3) * (x - x3) + (x3 - x2) * (y - y3)) /
+//                ((y2 - y3) * (x1 - x3) + (x3 - x2) * (y1 - y3));
+//    }
+
+
 
