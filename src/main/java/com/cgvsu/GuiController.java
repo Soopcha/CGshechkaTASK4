@@ -15,6 +15,7 @@ import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.stage.FileChooser;
@@ -24,14 +25,46 @@ import java.nio.file.Path;
 import java.io.IOException;
 import java.io.File;
 import com.cgvsu.objwriter.ObjWriter;
+
 import com.cgvsu.model.Model;
 import com.cgvsu.objreader.ObjReader;
+
+//import com.cgvsu.model.TransformedTriangulatedModel;
 import com.cgvsu.model.PolygonRemover;
 import com.cgvsu.model.RemoveVertices;
+import com.cgvsu.affine_transformation.AffineTransf;
+import com.cgvsu.affine_transformation.OrderRotation;
+import com.cgvsu.model.TransformedModel;
+import com.cgvsu.model.TriangulatedModelWithCorrectNormal;
+import com.cgvsu.objreader.IncorrectFileException;
+import com.cgvsu.objreader.ObjReaderException;
 import com.cgvsu.render_engine.RenderEngine;
+import javafx.fxml.FXML;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.event.ActionEvent;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
+import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
+import javafx.stage.FileChooser;
+import javafx.util.Duration;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.io.IOException;
+import java.io.File;
+import javax.vecmath.Vector3f;
+import com.cgvsu.objwriter.ObjWriter;
+
+import com.cgvsu.model.Model;
+import com.cgvsu.objreader.ObjReader;
 import com.cgvsu.render_engine.Camera;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -43,6 +76,7 @@ public class GuiController {
     public TextField newCameraZ;
     private TransformedModel transformedModel;
     private CameraManager cameraManager;
+    private double[][] zBuffer;
 
     final private float TRANSLATION = 0.5F;
 
@@ -53,6 +87,11 @@ public class GuiController {
     private TextField removePolygonsField;
 
 
+
+
+
+    private int selectedModelIndex;
+
     private List<Boolean> modelVisibility = new ArrayList<>();
     private int activeModelIndex = 0;
 
@@ -60,11 +99,13 @@ public class GuiController {
     @FXML
     AnchorPane anchorPane;
 
+    private double mouseX, mouseY;
+
     @FXML
     private Canvas canvas;
 
     @FXML
-    private ComboBox<String> modelComboBox;
+    private ComboBox<String> modelComboBox; // Добавлен ComboBox
 
     private Model mesh = null;
     @FXML
@@ -104,6 +145,14 @@ public class GuiController {
         anchorPane.prefWidthProperty().addListener((ov, oldValue, newValue) -> canvas.setWidth(newValue.doubleValue()));
         anchorPane.prefHeightProperty().addListener((ov, oldValue, newValue) -> canvas.setHeight(newValue.doubleValue()));
 
+        zBuffer = new double[(int) canvas.getWidth()][(int) canvas.getHeight()];
+        for (int i = 0; i < canvas.getWidth(); i++) {
+            for (int j = 0; j < canvas.getHeight(); j++) {
+                zBuffer[i][j] = Double.POSITIVE_INFINITY; // Инициализация значением положительной бесконечности
+            }
+        }
+        // RenderEngine.setZBuffer(zBuffer);
+
         timeline = new Timeline();
         timeline.setCycleCount(Animation.INDEFINITE);
         xRotateField.setText("0");
@@ -138,18 +187,19 @@ public class GuiController {
         KeyFrame frame = new KeyFrame(Duration.millis(15), event -> {
             double width = canvas.getWidth();
             double height = canvas.getHeight();
+            clearZBuffer();
 
             canvas.getGraphicsContext2D().clearRect(0, 0, width, height);
             cameraManager.getCurrentCamera().setAspectRatio((float) (width / height));
 
-            if (getActiveModel() != null) {
+            if (mesh != null) {
 
                 // RenderEngine.render(canvas.getGraphicsContext2D(), camera, mesh, (int) width, (int) height);
-                RenderEngine.render(canvas.getGraphicsContext2D(), cameraManager.getCurrentCamera(), transformedModel.getTransformations().transformModel(getActiveModel()), (int) width, (int) height);
+                RenderEngine.render(canvas.getGraphicsContext2D(), cameraManager.getCurrentCamera(), transformedModel.getTransformations().transformModel(mesh), (int) width, (int) height,zBuffer);
 
             }
             for (Model model : models) {
-                RenderEngine.render(canvas.getGraphicsContext2D(), cameraManager.getCurrentCamera(), model, (int) width, (int) height);
+                RenderEngine.render(canvas.getGraphicsContext2D(), cameraManager.getCurrentCamera(), model, (int) width, (int) height,zBuffer);
             }
 
             renderScene();
@@ -167,6 +217,14 @@ public class GuiController {
 
         // Инициализация ComboBox с названиями моделей
         updateModelComboBox();
+    }
+    private void clearZBuffer() {
+
+        for (int i = 0; i < canvas.getWidth(); i++) {
+            for (int j = 0; j < canvas.getHeight(); j++) {
+                zBuffer[i][j] = Double.POSITIVE_INFINITY;
+            }
+        }
     }
 
 
@@ -307,15 +365,17 @@ public class GuiController {
         try {
             String fileContent = Files.readString(fileName);
             String objName = String.valueOf(fileName.getFileName());
-            Model model = ObjReader.read(fileContent);
-            TriangulatedModelWithCorrectNormal triangulatedModelWithCorrectNormal = new TriangulatedModelWithCorrectNormal(model);
+            mesh = ObjReader.read(fileContent);
+            TriangulatedModelWithCorrectNormal triangulatedModelWithCorrectNormal = new TriangulatedModelWithCorrectNormal(mesh);
             transformedModel = new TransformedModel(triangulatedModelWithCorrectNormal, new AffineTransf());
+            //Model model = ObjReader.read(fileContent);
             transformedModel.getTriangulatedModel().getInitialModel().modelName = objName;
             models.add(transformedModel.getTriangulatedModel().getInitialModel());
 
 
             //models.add(model);
             //models.add(transformedModel.getTriangulatedModel().getInitialModel());
+
 
 
             updateModelComboBox();
@@ -343,6 +403,7 @@ public class GuiController {
         // Обработчик события для кнопки "Ок"
         alert.showAndWait().ifPresent(response -> {
             if (response == okButton) {
+                // Действия после нажатия кнопки "Ок", если необходимо
             }
         });
     }
@@ -378,9 +439,39 @@ public class GuiController {
         }
 
         String fileName = file.getAbsolutePath();
-        ObjWriter.write(fileName, getActiveModel());
+        ObjWriter.write(fileName, transformedModel.getTransformations().transformModel(mesh));
     }
 
+
+    @FXML
+    public void handleCameraForward(ActionEvent actionEvent) {
+        cameraManager.getCurrentCamera().movePosition(new Vector3(0, 0, -TRANSLATION));
+    }
+
+    @FXML
+    public void handleCameraBackward(ActionEvent actionEvent) {
+        cameraManager.getCurrentCamera().movePosition(new Vector3(0, 0, TRANSLATION));
+    }
+
+    @FXML
+    public void handleCameraLeft(ActionEvent actionEvent) {
+        cameraManager.getCurrentCamera().movePosition(new Vector3(TRANSLATION, 0, 0));
+    }
+
+    @FXML
+    public void handleCameraRight(ActionEvent actionEvent) {
+        cameraManager.getCurrentCamera().movePosition(new Vector3(-TRANSLATION, 0, 0));
+    }
+
+    @FXML
+    public void handleCameraUp(ActionEvent actionEvent) {
+        cameraManager.getCurrentCamera().movePosition(new Vector3(0, TRANSLATION, 0));
+    }
+
+    @FXML
+    public void handleCameraDown(ActionEvent actionEvent) {
+        cameraManager.getCurrentCamera().movePosition(new Vector3(0, -TRANSLATION, 0));
+    }
 
 
     @FXML
@@ -400,7 +491,7 @@ public class GuiController {
 //             Model transformedMesh = transformedModel.getTransformations().transformModel(mesh);
 //             RenderEngine.render(canvas.getGraphicsContext2D(), camera, transformedMesh, (int) canvas.getWidth(), (int) canvas.getHeight());
             Model transformedMesh = transformedModel.getTransformations().transformModel(activeModel);
-            RenderEngine.render(canvas.getGraphicsContext2D(), cameraManager.getCurrentCamera(), transformedMesh, (int) canvas.getWidth(), (int) canvas.getHeight());
+            RenderEngine.render(canvas.getGraphicsContext2D(), cameraManager.getCurrentCamera(), transformedMesh, (int) canvas.getWidth(), (int) canvas.getHeight(),zBuffer);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -454,7 +545,7 @@ public class GuiController {
 
         if (activeModelIndex >= 0 && activeModelIndex < models.size()) {
             Model activeModel = models.get(activeModelIndex);
-            RenderEngine.render(canvas.getGraphicsContext2D(), cameraManager.getCurrentCamera(), transformedModel.getTransformations().transformModel(activeModel), (int) width, (int) height);
+            RenderEngine.render(canvas.getGraphicsContext2D(), cameraManager.getCurrentCamera(), transformedModel.getTransformations().transformModel(activeModel), (int) width, (int) height,zBuffer);
         }
     }
 
@@ -468,7 +559,7 @@ public class GuiController {
         for (int i = 0; i < models.size(); i++) {
             if (modelVisibility.get(i)) {
                 Model model = models.get(i);
-                RenderEngine.render(canvas.getGraphicsContext2D(), cameraManager.getCurrentCamera(), model, (int) width, (int) height);
+                RenderEngine.render(canvas.getGraphicsContext2D(), cameraManager.getCurrentCamera(), model, (int) width, (int) height,zBuffer);
             }
         }
     }

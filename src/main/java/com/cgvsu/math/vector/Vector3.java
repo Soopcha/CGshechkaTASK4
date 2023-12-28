@@ -1,5 +1,6 @@
 package com.cgvsu.math.vector;
 
+import javax.vecmath.Point2d;
 import java.util.List;
 import java.util.Objects;
 
@@ -217,8 +218,12 @@ public class Vector3 {
         this.y = other1.y - other2.y;
         this.z = other1.z - other2.z;
     }
-    public static Vector2 vertexToPoint(final Vector3 vertex, final int width, final int height) {
+    public static Vector2 vertexToPoint2(final Vector3 vertex, final int width, final int height) {
         return new Vector2((double) vertex.get(0) * width + width / 2.0F, (double) -vertex.get(1) * height + height / 2.0F);
     }
+    public static Point2d vertexToPoint(final Vector3 vertex, final int width, final int height) {
+        return new Point2d(vertex.getX() * width + width / 2.0F, -vertex.getY() * height + height / 2.0F);
+    }
+
 
 }

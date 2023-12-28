@@ -3,6 +3,8 @@ package com.cgvsu.math.matrix;
 import com.cgvsu.math.vector.Vector3;
 import com.cgvsu.math.vector.Vector4;
 
+import javax.vecmath.Matrix4f;
+
 public class Matrix4x4 {
     private double[][] matrix;
 
@@ -135,6 +137,7 @@ public class Matrix4x4 {
         final double w = (double) ((vertex.get(0) * matrix.getElem(0,3)) + (vertex.get(1) * matrix.getElem(1, 3)) + (vertex.get(2) * matrix.getElem(2, 3)) + matrix.getElem(3, 3));
         return new Vector3(x / w, y / w, z / w);
     }
+
     public static Matrix4x4 rotateScaleTranslate() {
         double[][] matrix = {
                 {1, 0, 0, 0},
