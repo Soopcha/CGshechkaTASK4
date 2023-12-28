@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class AffineTransf {
 
     //Перечисление отвечающее за порядок поворотов в каждой из плоскостей
-    private OrderRotation or = OrderRotation.ZYX;
+    private OrderRotation or = OrderRotation.XYZ;
     //Параметры масштабирования
     private double Sx = 1;
     private double Sy = 1;
