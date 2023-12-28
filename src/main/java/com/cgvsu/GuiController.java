@@ -43,9 +43,6 @@ public class GuiController {
     public TextField newCameraZ;
     private TransformedModel transformedModel;
     private CameraManager cameraManager;
-
-    final private float TRANSLATION = 0.5F;
-
     @FXML
     private TextField removeVerticesField;
 
@@ -66,7 +63,6 @@ public class GuiController {
     @FXML
     private ComboBox<String> modelComboBox;
 
-    private Model mesh = null;
     @FXML
     public TextField xRotateField;
 
@@ -312,12 +308,6 @@ public class GuiController {
             transformedModel = new TransformedModel(triangulatedModelWithCorrectNormal, new AffineTransf());
             transformedModel.getTriangulatedModel().getInitialModel().modelName = objName;
             models.add(transformedModel.getTriangulatedModel().getInitialModel());
-
-
-            //models.add(model);
-            //models.add(transformedModel.getTriangulatedModel().getInitialModel());
-
-
             updateModelComboBox();
         } catch (IOException exception) {
             // Ошибка при чтении файла.
