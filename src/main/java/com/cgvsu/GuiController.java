@@ -53,11 +53,6 @@ public class GuiController {
     private TextField removePolygonsField;
 
 
-
-
-
-    private int selectedModelIndex;
-
     private List<Boolean> modelVisibility = new ArrayList<>();
     private int activeModelIndex = 0;
 
@@ -65,13 +60,11 @@ public class GuiController {
     @FXML
     AnchorPane anchorPane;
 
-    private double mouseX, mouseY;
-
     @FXML
     private Canvas canvas;
 
     @FXML
-    private ComboBox<String> modelComboBox; // Добавлен ComboBox
+    private ComboBox<String> modelComboBox;
 
     private Model mesh = null;
     @FXML
@@ -390,36 +383,6 @@ public class GuiController {
         ObjWriter.write(fileName, transformedModel.getTransformations().transformModel(getActiveModel()));
     }
 
-
-    @FXML
-    public void handleCameraForward(ActionEvent actionEvent) {
-        cameraManager.getCurrentCamera().movePosition(new Vector3(0, 0, -TRANSLATION));
-    }
-
-    @FXML
-    public void handleCameraBackward(ActionEvent actionEvent) {
-        cameraManager.getCurrentCamera().movePosition(new Vector3(0, 0, TRANSLATION));
-    }
-
-    @FXML
-    public void handleCameraLeft(ActionEvent actionEvent) {
-        cameraManager.getCurrentCamera().movePosition(new Vector3(TRANSLATION, 0, 0));
-    }
-
-    @FXML
-    public void handleCameraRight(ActionEvent actionEvent) {
-        cameraManager.getCurrentCamera().movePosition(new Vector3(-TRANSLATION, 0, 0));
-    }
-
-    @FXML
-    public void handleCameraUp(ActionEvent actionEvent) {
-        cameraManager.getCurrentCamera().movePosition(new Vector3(0, TRANSLATION, 0));
-    }
-
-    @FXML
-    public void handleCameraDown(ActionEvent actionEvent) {
-        cameraManager.getCurrentCamera().movePosition(new Vector3(0, -TRANSLATION, 0));
-    }
 
 
     @FXML
