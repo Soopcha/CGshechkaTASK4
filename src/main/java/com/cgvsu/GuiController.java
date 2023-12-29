@@ -139,9 +139,9 @@ public class GuiController {
             cameraManager.getCurrentCamera().setAspectRatio((float) (width / height));
 
             if (getActiveModel() != null) {
-
+                Model model = getActiveModel();
                 // RenderEngine.render(canvas.getGraphicsContext2D(), camera, mesh, (int) width, (int) height);
-                RenderEngine.render(canvas.getGraphicsContext2D(), cameraManager.getCurrentCamera(), transformedModel.getTransformations().transformModel(getActiveModel()), (int) width, (int) height);
+                RenderEngine.render(canvas.getGraphicsContext2D(), cameraManager.getCurrentCamera(), transformedModel.getTransformations().transformModel(model), (int) width, (int) height);
 
             }
             for (Model model : models) {
@@ -350,7 +350,7 @@ public class GuiController {
             }
 
             String fileName = file.getAbsolutePath();
-            ObjWriter.write(fileName, models.get(currentModelIndex));
+            ObjWriter.write(fileName, getActiveModel());
         }
     }
 
@@ -368,7 +368,7 @@ public class GuiController {
         }
 
         String fileName = file.getAbsolutePath();
-        ObjWriter.write(fileName, getActiveModel());
+        ObjWriter.write(fileName, transformedModel.getTransformations().transformModel(getActiveModel()));
     }
 
 
@@ -429,7 +429,8 @@ public class GuiController {
 
     public Model getActiveModel() {
         if (activeModelIndex >= 0 && activeModelIndex < models.size()) {
-            return transformedModel.getTransformations().transformModel(models.get(activeModelIndex));
+           // return transformedModel.getTransformations().transformModel(models.get(activeModelIndex));
+            return models.get(activeModelIndex);
         } else {
             return null; // Индекс за пределами массива
         }
@@ -444,7 +445,8 @@ public class GuiController {
 
         if (activeModelIndex >= 0 && activeModelIndex < models.size()) {
             Model activeModel = models.get(activeModelIndex);
-            RenderEngine.render(canvas.getGraphicsContext2D(), cameraManager.getCurrentCamera(), transformedModel.getTransformations().transformModel(activeModel), (int) width, (int) height);
+         RenderEngine.render(canvas.getGraphicsContext2D(), cameraManager.getCurrentCamera(), transformedModel.getTransformations().transformModel(activeModel), (int) width, (int) height);
+            //RenderEngine.render(canvas.getGraphicsContext2D(), cameraManager.getCurrentCamera(), activeModel, (int) width, (int) height);
         }
     }
 
@@ -474,6 +476,7 @@ public class GuiController {
     @FXML
     private void onRemoveButtonClick() {
         try {
+            Model model = getActiveModel();
             if (getActiveModel() == null) {
                 return;
             }
@@ -487,7 +490,8 @@ public class GuiController {
                 for (String indexStr : indicesString) {
                     verticesToRemove.add(Integer.parseInt(indexStr.trim()));
                 }
-                RemoveVertices.removeVertices(getActiveModel(), verticesToRemove);
+               // RemoveVertices.removeVertices(getActiveModel(), verticesToRemove);
+                RemoveVertices.removeVertices(model, verticesToRemove);
             }
 
             if (!polygonsInput.isEmpty()) {
@@ -496,11 +500,12 @@ public class GuiController {
                 for (String indexStr : indicesString) {
                     polygonsToRemove.add(Integer.parseInt(indexStr.trim()));
                 }
-                PolygonRemover.removeSelectedPolygons(getActiveModel(), polygonsToRemove);
+                //PolygonRemover.removeSelectedPolygons(getActiveModel(), polygonsToRemove);
+                PolygonRemover.removeSelectedPolygons(model, polygonsToRemove);
             }
 
             if (transformedModel != null) {
-                transformedModel = new TransformedModel(new TriangulatedModelWithCorrectNormal(getActiveModel()), transformedModel.getTransformations());
+                transformedModel = new TransformedModel(new TriangulatedModelWithCorrectNormal(model), transformedModel.getTransformations());
             }
 
         } catch (NumberFormatException | IndexOutOfBoundsException | NullPointerException e) {
