@@ -39,8 +39,8 @@ public class RenderEngine {
 
             ArrayList<Point2d> resultPoints = new ArrayList<>();
             for (int vertexInPolygonInd = 0; vertexInPolygonInd < nVerticesInPolygon; ++vertexInPolygonInd) {
-                Vector3 vertex = mesh.vertices.get(mesh.polygons.get(polygonInd).getVertexIndices().get(vertexInPolygonInd));
-                Vector3 vertexVecmath = new Vector3(vertex.getX(), vertex.getY(), vertex.getZ());
+                Vector3 vertexVecmath = mesh.vertices.get(mesh.polygons.get(polygonInd).getVertexIndices().get(vertexInPolygonInd));
+//                Vector3 vertexVecmath = new Vector3(vertex.getX(), vertex.getY(), vertex.getZ());
 
                 Point2d resultPoint = vertexToPoint(multiplyMatrix4ByVector3(modelViewProjectionMatrix, vertexVecmath), width, height);
                 resultPoints.add(resultPoint);
@@ -62,7 +62,7 @@ public class RenderEngine {
 ////                        resultPoints.get(vertexInPolygonInd).y);
 //            }
 
-            if (nVerticesInPolygon > 2) fillPolygons(
+            if (nVerticesInPolygon == 3) fillPolygons(
                     graphicsContext,
                     camera,
                     mesh,
@@ -128,19 +128,20 @@ public class RenderEngine {
 
         // Предварительно вычисляем штуку но мб это не верно
         double detT = (y2 - y3) * (x1 - x3) + (x3 - x2) * (y1 - y3);
+        double invDetT = 1.0 / detT;
 
         // Используем алгоритм барицентрических координат для определения принадлежности точек треугольнику
         for (int x = minX; x <= maxX; x++) {
             for (int y = minY; y <= maxY; y++) {
                 double b1 = barycentricCoordinate(
                         x2, y2, x3, y3,
-                        x1, y1, x, y,detT);
+                        x1, y1, x, y,invDetT);
                 double b2 = barycentricCoordinate(
                         x3, y3, x1, y1,
-                        x2, y2, x, y,detT);
+                        x2, y2, x, y,invDetT);
                 double b3 = barycentricCoordinate(
                         x1, y1, x2, y2,
-                        x3, y3, x, y,detT);
+                        x3, y3, x, y,invDetT);
 
                 if (b1 >= 0 && b2 >= 0 && b3 >= 0) {
                     // Точка (x, y) находится внутри треугольника
@@ -170,12 +171,13 @@ public class RenderEngine {
             double x1, double y1,
             double x2, double y2,
             double x3, double y3,
-            double x, double y, double detT) {
+            double x, double y, double invDetT) {
         // Calculate the barycentric coordinates
 //        double detT = (y2 - y3) * (x1 - x3) + (x3 - x2) * (y1 - y3);
-        double lambda1 = ((y2 - y3) * (x - x3) + (x3 - x2) * (y - y3)) / detT;
-        double lambda2 = ((y3 - y1) * (x - x3) + (x1 - x3) * (y - y3)) / detT;
+        double lambda1 = ((y2 - y3) * (x - x3) + (x3 - x2) * (y - y3)) * invDetT ;
+        double lambda2 = ((y3 - y1) * (x - x3) + (x1 - x3) * (y - y3)) * invDetT ;
         double lambda3 = 1 - lambda1 - lambda2;
+
 
         // Check if the point is inside the triangle
         if (lambda1 >= 0 && lambda1 <= 1 && lambda2 >= 0 && lambda2 <= 1 && lambda3 >= 0 && lambda3 <= 1) {
