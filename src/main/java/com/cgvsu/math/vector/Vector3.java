@@ -119,7 +119,6 @@ public class Vector3 {
     }
 
 
-    //дописала по коду Артема п
     public void cross(Vector3 v1, Vector3 v2) {
         if (v1 == null || v2 == null) {
             throw new IllegalArgumentException("Vector can not be null");
@@ -158,24 +157,10 @@ public class Vector3 {
         return new Vector3(sumX, sumY, sumZ);
     }
 
-    //дописала по коду Артема п 3 метода
     @Override
     public int hashCode() {
         return Objects.hash(x, y, z);
     }
-
-
-    /* @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Vector3 vector3 = (Vector3) o;
-        return Double.compare(vector3.getX(), x) == 0 &&
-                Double.compare(vector3.getY(), y) == 0 &&
-                Double.compare(vector3.getZ(), z) == 0;
-    }
-
-     */
 
     @Override
     public boolean equals(Object o) {
@@ -209,9 +194,6 @@ public class Vector3 {
         throw new IllegalArgumentException("Индекс выходит за границы");
     }
 
-    //    public static Vector2 vertexToPoint1(final Vector3 vertex, final int width, final int height) {
-//        return new Vector2((float) vertex.get(0) * width + width / 2.0F, (float) -vertex.get(1) * height + height / 2.0F);
-//    }
     public final void subtract(Vector3 other1, Vector3 other2) {
         this.x = other1.x - other2.x;
         this.y = other1.y - other2.y;
@@ -219,6 +201,11 @@ public class Vector3 {
     }
     public static Vector2 vertexToPoint(final Vector3 vertex, final int width, final int height) {
         return new Vector2((double) vertex.get(0) * width + width / 2.0F, (double) -vertex.get(1) * height + height / 2.0F);
+    }
+    public void setAll(double valueX, double valueY, double valueZ){
+        this.x = valueX;
+        this.y = valueY;
+        this.z = valueZ;
     }
 
 }

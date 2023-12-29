@@ -1,6 +1,6 @@
 package com.cgvsu.affine_transformation;
 
-public enum OrderRotation {
+public enum RotationOrder {
     ZYX,
     ZXY,
     YZX,
