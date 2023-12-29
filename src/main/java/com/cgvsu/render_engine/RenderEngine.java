@@ -83,11 +83,12 @@ public class RenderEngine {
 
         // Проходим по всем полигонам модели
         for (Polygon polygon : mesh.getPolygons()) {
+
             // Получаем вершины полигона в мировых координатах
             ArrayList<Vector3> polygonVertices = new ArrayList<>();
             for (int vertexIndex : polygon.getVertexIndices()) {
-                Vector3 vertex = mesh.getVertices().get(vertexIndex);
-                Vector3 vertexVecmath = new Vector3(vertex.getX(), vertex.getY(), vertex.getZ());
+                Vector3 vertexVecmath = mesh.getVertices().get(vertexIndex);
+                //Vector3 vertexVecmath = new Vector3(vertex.getX(), vertex.getY(), vertex.getZ());
 
                 Vector3 projectedPoint = multiplyMatrix4ByVector3(modelViewProjectionMatrix,vertexVecmath);
                 Point2d screenPoint = vertexToPoint(projectedPoint,width,height);
@@ -95,6 +96,7 @@ public class RenderEngine {
 
                 polygonVertices.add(new Vector3(screenPoint.x, screenPoint.y, projectedPoint.getZ()));
             }
+
 
             // Растеризация треугольника
             rasterizeTriangle(graphicsContext, polygonVertices, width, height, fillColor,zBuffer);

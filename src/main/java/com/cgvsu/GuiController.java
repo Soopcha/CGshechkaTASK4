@@ -28,6 +28,7 @@ import java.nio.file.Path;
 import java.io.IOException;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -88,12 +89,15 @@ public class GuiController {
         anchorPane.prefHeightProperty().addListener((ov, oldValue, newValue) -> canvas.setHeight(newValue.doubleValue()));
 
         zBuffer = new double[(int) canvas.getWidth()][(int) canvas.getHeight()];
-        for (int i = 0; i < canvas.getWidth(); i++) {
-            for (int j = 0; j < canvas.getHeight(); j++) {
-                zBuffer[i][j] = Double.POSITIVE_INFINITY; // Инициализация значением положительной бесконечности
-            }
+//        for (int i = 0; i < canvas.getWidth(); i++) {
+//            for (int j = 0; j < canvas.getHeight(); j++) {
+//                zBuffer[i][j] = Double.POSITIVE_INFINITY; // Инициализация значением положительной бесконечности
+//            }
+//        }
+        for (double[] row : zBuffer) {
+            Arrays.fill(row, Double.POSITIVE_INFINITY);
         }
-       // RenderEngine.setZBuffer(zBuffer);
+
 
 
         timeline = new Timeline();
@@ -136,10 +140,13 @@ public class GuiController {
     }
     private void clearZBuffer() {
 
-        for (int i = 0; i < canvas.getWidth(); i++) {
-            for (int j = 0; j < canvas.getHeight(); j++) {
-                zBuffer[i][j] = Double.POSITIVE_INFINITY;
-            }
+//        for (int i = 0; i < canvas.getWidth(); i++) {
+//            for (int j = 0; j < canvas.getHeight(); j++) {
+//                zBuffer[i][j] = Double.POSITIVE_INFINITY;
+//            }
+//        }
+        for (double[] row : zBuffer) {
+            Arrays.fill(row, Double.POSITIVE_INFINITY);
         }
     }
 
