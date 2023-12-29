@@ -128,7 +128,7 @@ public class Matrix4x4 {
         double[][] result = new double[4][4];
         return new Matrix4x4(result);
     }
-    public static Vector3 multiplyMatrix4ByVector3(final Matrix4x4 matrix, final Vector3 vertex) {
+    public static Vector3 multiplyMatrix4ByVector3AndPerspectiveDivide(final Matrix4x4 matrix, final Vector3 vertex) {
         final double x = (double) ((vertex.get(0) * matrix.getElem(0,0)) + (vertex.get(1) * matrix.getElem(1, 0)) + (vertex.get(2) * matrix.getElem(2, 0)) + matrix.getElem(3, 0));
         final double y = (double) ((vertex.get(0) * matrix.getElem(0,1)) + (vertex.get(1) * matrix.getElem(1, 1)) + (vertex.get(2) * matrix.getElem(2, 1)) + matrix.getElem(3, 1));
         final double z = (double) ((vertex.get(0) * matrix.getElem(0,2)) + (vertex.get(1) * matrix.getElem(1, 2)) + (vertex.get(2) * matrix.getElem(2, 2)) + matrix.getElem(3, 2));

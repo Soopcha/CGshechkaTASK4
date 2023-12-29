@@ -1,6 +1,5 @@
 package com.cgvsu.model;
 
-import com.cgvsu.affine_transformation.AffineTransf;
 import com.cgvsu.math.vector.Vector2;
 import com.cgvsu.math.vector.Vector3;
 

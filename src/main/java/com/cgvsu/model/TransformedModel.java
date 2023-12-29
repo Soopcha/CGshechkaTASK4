@@ -1,22 +1,22 @@
 package com.cgvsu.model;
 
-import com.cgvsu.affine_transformation.AffineTransf;
+import com.cgvsu.affine_transformation.AffineTransformations;
 
 public class TransformedModel {
     private final TriangulatedModelWithCorrectNormal triangulatedModel;
 
-    private AffineTransf transformations;
+    private AffineTransformations transformations;
 
 
     public TriangulatedModelWithCorrectNormal getTriangulatedModel() {
         return triangulatedModel;
     }
 
-    public AffineTransf getTransformations() {
+    public AffineTransformations getTransformations() {
         return transformations;
     }
 
-    public TransformedModel(TriangulatedModelWithCorrectNormal triangulatedModel, AffineTransf transformations) {
+    public TransformedModel(TriangulatedModelWithCorrectNormal triangulatedModel, AffineTransformations transformations) {
         this.triangulatedModel = triangulatedModel;
         this.transformations = transformations;
     }

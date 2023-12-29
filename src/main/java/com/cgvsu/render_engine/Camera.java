@@ -5,6 +5,12 @@ import static com.cgvsu.math.matrix.Matrix4x4.*;
 
 
 public class Camera {
+    private Vector3 position;
+    private Vector3 target;
+    private float fov;
+    private float aspectRatio;
+    private float nearPlane;
+    private float farPlane;
 
     private double mousePosX;
     private double mousePosY;
@@ -61,12 +67,7 @@ public class Camera {
         return perspective(fov, aspectRatio, nearPlane, farPlane);
     }
 
-    private Vector3 position;
-    private Vector3 target;
-    private float fov;
-    private float aspectRatio;
-    private float nearPlane;
-    private float farPlane;
+
     public void handleMouseInput(double x, double y, boolean isPrimaryButtonDown, boolean isSecondaryButtonDown) {
 
         if (isPrimaryButtonDown) {
@@ -95,6 +96,6 @@ public class Camera {
 
         Matrix4x4 rotationMatrix = rotationMatrixX.multiply(rotationMatrixY);
 
-        position = multiplyMatrix4ByVector3(rotationMatrix, position);
+        position = multiplyMatrix4ByVector3AndPerspectiveDivide(rotationMatrix, position);
     }
 }

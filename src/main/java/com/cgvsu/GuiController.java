@@ -1,8 +1,8 @@
 package com.cgvsu;
 
 import com.cgvsu.math.vector.Vector3;
-import com.cgvsu.affine_transformation.AffineTransf;
-import com.cgvsu.affine_transformation.OrderRotation;
+import com.cgvsu.affine_transformation.AffineTransformations;
+import com.cgvsu.affine_transformation.RotationOrder;
 import com.cgvsu.model.TransformedModel;
 import com.cgvsu.model.TriangulatedModelWithCorrectNormal;
 import com.cgvsu.objreader.IncorrectFileException;
@@ -44,12 +44,12 @@ public class GuiController {
     public TextField newCameraZ;
     private TransformedModel transformedModel;
     private CameraManager cameraManager;
+    private double[][] zBuffer;
     @FXML
     private TextField removeVerticesField;
 
     @FXML
     private TextField removePolygonsField;
-    private double[][] zBuffer;
 
 
     private List<Boolean> modelVisibility = new ArrayList<>();
@@ -141,14 +141,13 @@ public class GuiController {
         KeyFrame frame = new KeyFrame(Duration.millis(15), event -> {
             double width = canvas.getWidth();
             double height = canvas.getHeight();
+            clearZBuffer();
 
             canvas.getGraphicsContext2D().clearRect(0, 0, width, height);
             cameraManager.getCurrentCamera().setAspectRatio((float) (width / height));
-            clearZBuffer();
 
             if (getActiveModel() != null) {
                 Model model = getActiveModel();
-                // RenderEngine.render(canvas.getGraphicsContext2D(), camera, mesh, (int) width, (int) height);
                 RenderEngine.render(canvas.getGraphicsContext2D(), cameraManager.getCurrentCamera(), transformedModel.getTransformations().transformModel(model), (int) width, (int) height,zBuffer);
 
             }
@@ -178,6 +177,7 @@ public class GuiController {
             Arrays.fill(row, Double.POSITIVE_INFINITY);
         }
     }
+
 
     private void updateModelComboBox() {
         modelComboBox.getItems().clear();
@@ -261,8 +261,8 @@ public class GuiController {
     }
 
     private void resetTransformations() {
-        AffineTransf zeroTransformations = new AffineTransf(
-                OrderRotation.XYZ, 1, 1, 1,
+        AffineTransformations zeroTransformations = new AffineTransformations(
+                RotationOrder.XYZ, 1, 1, 1,
                 0, 0, 0,
                 0, 0, 0);
 
@@ -318,7 +318,7 @@ public class GuiController {
             String objName = String.valueOf(fileName.getFileName());
             Model model = ObjReader.read(fileContent);
             TriangulatedModelWithCorrectNormal triangulatedModelWithCorrectNormal = new TriangulatedModelWithCorrectNormal(model);
-            transformedModel = new TransformedModel(triangulatedModelWithCorrectNormal, new AffineTransf());
+            transformedModel = new TransformedModel(triangulatedModelWithCorrectNormal, new AffineTransformations());
             transformedModel.getTriangulatedModel().getInitialModel().modelName = objName;
             models.add(transformedModel.getTriangulatedModel().getInitialModel());
             updateModelComboBox();
@@ -400,8 +400,6 @@ public class GuiController {
             }
             updateTransformations();
 
-//             Model transformedMesh = transformedModel.getTransformations().transformModel(mesh);
-//             RenderEngine.render(canvas.getGraphicsContext2D(), camera, transformedMesh, (int) canvas.getWidth(), (int) canvas.getHeight());
             Model transformedMesh = transformedModel.getTransformations().transformModel(activeModel);
             RenderEngine.render(canvas.getGraphicsContext2D(), cameraManager.getCurrentCamera(), transformedMesh, (int) canvas.getWidth(), (int) canvas.getHeight(),zBuffer);
 
@@ -426,8 +424,8 @@ public class GuiController {
             double translateYValue = Double.parseDouble(translateY.getText());
             double translateZValue = Double.parseDouble(translateZ.getText());
 
-            AffineTransf updatedTransformations = new AffineTransf(
-                    OrderRotation.XYZ, xScaleValue, yScaleValue, zScaleValue,
+            AffineTransformations updatedTransformations = new AffineTransformations(
+                    RotationOrder.XYZ, xScaleValue, yScaleValue, zScaleValue,
                     xRotate, yRotate, zRotate,
                     translateXValue, translateYValue, translateZValue);
             TriangulatedModelWithCorrectNormal triangulatedModelWithCorrectNormal = new TriangulatedModelWithCorrectNormal(getActiveModel());
@@ -442,7 +440,6 @@ public class GuiController {
 
     public Model getActiveModel() {
         if (activeModelIndex >= 0 && activeModelIndex < models.size()) {
-           // return transformedModel.getTransformations().transformModel(models.get(activeModelIndex));
             return models.get(activeModelIndex);
         } else {
             return null; // Индекс за пределами массива
@@ -459,7 +456,6 @@ public class GuiController {
         if (activeModelIndex >= 0 && activeModelIndex < models.size()) {
             Model activeModel = models.get(activeModelIndex);
          RenderEngine.render(canvas.getGraphicsContext2D(), cameraManager.getCurrentCamera(), transformedModel.getTransformations().transformModel(activeModel), (int) width, (int) height,zBuffer);
-            //RenderEngine.render(canvas.getGraphicsContext2D(), cameraManager.getCurrentCamera(), activeModel, (int) width, (int) height);
         }
     }
 
@@ -503,7 +499,6 @@ public class GuiController {
                 for (String indexStr : indicesString) {
                     verticesToRemove.add(Integer.parseInt(indexStr.trim()));
                 }
-               // RemoveVertices.removeVertices(getActiveModel(), verticesToRemove);
                 RemoveVertices.removeVertices(model, verticesToRemove);
             }
 
@@ -513,7 +508,6 @@ public class GuiController {
                 for (String indexStr : indicesString) {
                     polygonsToRemove.add(Integer.parseInt(indexStr.trim()));
                 }
-                //PolygonRemover.removeSelectedPolygons(getActiveModel(), polygonsToRemove);
                 PolygonRemover.removeSelectedPolygons(model, polygonsToRemove);
             }
 
