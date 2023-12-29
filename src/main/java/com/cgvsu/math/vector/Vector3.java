@@ -187,7 +187,7 @@ public class Vector3 {
                 Math.abs(vector3.getZ() - z) < EPSILON;
     }
 
-    private static final double EPSILON = 1e-10;  // или любое другое подходящее значение погрешности
+    private static final double EPSILON = 1e-5;  // или любое другое подходящее значение погрешности
 
     @Override
     public String toString() {

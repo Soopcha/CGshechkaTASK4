@@ -33,6 +33,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
 import com.cgvsu.render_engine.Camera;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,6 +49,7 @@ public class GuiController {
 
     @FXML
     private TextField removePolygonsField;
+    private double[][] zBuffer;
 
 
     private List<Boolean> modelVisibility = new ArrayList<>();
@@ -100,6 +102,11 @@ public class GuiController {
         anchorPane.prefWidthProperty().addListener((ov, oldValue, newValue) -> canvas.setWidth(newValue.doubleValue()));
         anchorPane.prefHeightProperty().addListener((ov, oldValue, newValue) -> canvas.setHeight(newValue.doubleValue()));
 
+        zBuffer = new double[(int) canvas.getWidth()][(int) canvas.getHeight()];
+        for (double[] row : zBuffer) {
+            Arrays.fill(row, Double.POSITIVE_INFINITY);
+        }
+
         timeline = new Timeline();
         timeline.setCycleCount(Animation.INDEFINITE);
         xRotateField.setText("0");
@@ -137,15 +144,16 @@ public class GuiController {
 
             canvas.getGraphicsContext2D().clearRect(0, 0, width, height);
             cameraManager.getCurrentCamera().setAspectRatio((float) (width / height));
+            clearZBuffer();
 
             if (getActiveModel() != null) {
                 Model model = getActiveModel();
                 // RenderEngine.render(canvas.getGraphicsContext2D(), camera, mesh, (int) width, (int) height);
-                RenderEngine.render(canvas.getGraphicsContext2D(), cameraManager.getCurrentCamera(), transformedModel.getTransformations().transformModel(model), (int) width, (int) height);
+                RenderEngine.render(canvas.getGraphicsContext2D(), cameraManager.getCurrentCamera(), transformedModel.getTransformations().transformModel(model), (int) width, (int) height,zBuffer);
 
             }
             for (Model model : models) {
-                RenderEngine.render(canvas.getGraphicsContext2D(), cameraManager.getCurrentCamera(), model, (int) width, (int) height);
+                RenderEngine.render(canvas.getGraphicsContext2D(), cameraManager.getCurrentCamera(), model, (int) width, (int) height,zBuffer);
             }
 
             renderScene();
@@ -165,6 +173,11 @@ public class GuiController {
         updateModelComboBox();
     }
 
+    private void clearZBuffer() {
+        for (double[] row : zBuffer) {
+            Arrays.fill(row, Double.POSITIVE_INFINITY);
+        }
+    }
 
     private void updateModelComboBox() {
         modelComboBox.getItems().clear();
@@ -390,7 +403,7 @@ public class GuiController {
 //             Model transformedMesh = transformedModel.getTransformations().transformModel(mesh);
 //             RenderEngine.render(canvas.getGraphicsContext2D(), camera, transformedMesh, (int) canvas.getWidth(), (int) canvas.getHeight());
             Model transformedMesh = transformedModel.getTransformations().transformModel(activeModel);
-            RenderEngine.render(canvas.getGraphicsContext2D(), cameraManager.getCurrentCamera(), transformedMesh, (int) canvas.getWidth(), (int) canvas.getHeight());
+            RenderEngine.render(canvas.getGraphicsContext2D(), cameraManager.getCurrentCamera(), transformedMesh, (int) canvas.getWidth(), (int) canvas.getHeight(),zBuffer);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -445,7 +458,7 @@ public class GuiController {
 
         if (activeModelIndex >= 0 && activeModelIndex < models.size()) {
             Model activeModel = models.get(activeModelIndex);
-         RenderEngine.render(canvas.getGraphicsContext2D(), cameraManager.getCurrentCamera(), transformedModel.getTransformations().transformModel(activeModel), (int) width, (int) height);
+         RenderEngine.render(canvas.getGraphicsContext2D(), cameraManager.getCurrentCamera(), transformedModel.getTransformations().transformModel(activeModel), (int) width, (int) height,zBuffer);
             //RenderEngine.render(canvas.getGraphicsContext2D(), cameraManager.getCurrentCamera(), activeModel, (int) width, (int) height);
         }
     }
@@ -460,7 +473,7 @@ public class GuiController {
         for (int i = 0; i < models.size(); i++) {
             if (modelVisibility.get(i)) {
                 Model model = models.get(i);
-                RenderEngine.render(canvas.getGraphicsContext2D(), cameraManager.getCurrentCamera(), model, (int) width, (int) height);
+                RenderEngine.render(canvas.getGraphicsContext2D(), cameraManager.getCurrentCamera(), model, (int) width, (int) height,zBuffer);
             }
         }
     }
