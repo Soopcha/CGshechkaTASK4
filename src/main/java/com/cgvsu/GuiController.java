@@ -1,8 +1,8 @@
 package com.cgvsu;
 
 import com.cgvsu.math.vector.Vector3;
-import com.cgvsu.affine_transformation.AffineTransf;
-import com.cgvsu.affine_transformation.OrderRotation;
+import com.cgvsu.affine_transformation.AffineTransformations;
+import com.cgvsu.affine_transformation.RotationOrder;
 import com.cgvsu.model.TransformedModel;
 import com.cgvsu.model.TriangulatedModelWithCorrectNormal;
 import com.cgvsu.objreader.IncorrectFileException;
@@ -248,8 +248,8 @@ public class GuiController {
     }
 
     private void resetTransformations() {
-        AffineTransf zeroTransformations = new AffineTransf(
-                OrderRotation.XYZ, 1, 1, 1,
+        AffineTransformations zeroTransformations = new AffineTransformations(
+                RotationOrder.XYZ, 1, 1, 1,
                 0, 0, 0,
                 0, 0, 0);
 
@@ -305,7 +305,7 @@ public class GuiController {
             String objName = String.valueOf(fileName.getFileName());
             Model model = ObjReader.read(fileContent);
             TriangulatedModelWithCorrectNormal triangulatedModelWithCorrectNormal = new TriangulatedModelWithCorrectNormal(model);
-            transformedModel = new TransformedModel(triangulatedModelWithCorrectNormal, new AffineTransf());
+            transformedModel = new TransformedModel(triangulatedModelWithCorrectNormal, new AffineTransformations());
             transformedModel.getTriangulatedModel().getInitialModel().modelName = objName;
             models.add(transformedModel.getTriangulatedModel().getInitialModel());
             updateModelComboBox();
@@ -413,8 +413,8 @@ public class GuiController {
             double translateYValue = Double.parseDouble(translateY.getText());
             double translateZValue = Double.parseDouble(translateZ.getText());
 
-            AffineTransf updatedTransformations = new AffineTransf(
-                    OrderRotation.XYZ, xScaleValue, yScaleValue, zScaleValue,
+            AffineTransformations updatedTransformations = new AffineTransformations(
+                    RotationOrder.XYZ, xScaleValue, yScaleValue, zScaleValue,
                     xRotate, yRotate, zRotate,
                     translateXValue, translateYValue, translateZValue);
             TriangulatedModelWithCorrectNormal triangulatedModelWithCorrectNormal = new TriangulatedModelWithCorrectNormal(getActiveModel());
