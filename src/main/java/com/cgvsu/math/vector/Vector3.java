@@ -3,6 +3,8 @@ package com.cgvsu.math.vector;
 import java.util.List;
 import java.util.Objects;
 
+import static com.cgvsu.math.MathSettings.EPS;
+
 public class Vector3 {
     private double x;
     private double y;
@@ -78,7 +80,7 @@ public class Vector3 {
 
     // Операция деления вектора на скаляр
     public Vector3 divide(double scalar) {
-        if (scalar == 0) {
+        if (Math.abs(scalar) < EPS) {
             throw new IllegalArgumentException("Cannot divide by zero");
         }
         double newX = this.x / scalar;
@@ -191,7 +193,7 @@ public class Vector3 {
             case 2:
                 return z;
         }
-        throw new IllegalArgumentException("Индекс выходит за границы");
+        throw new IllegalArgumentException("Vector3 не имеет координаты с индексом " + index);
     }
 
     public final void subtract(Vector3 other1, Vector3 other2) {

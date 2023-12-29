@@ -1,4 +1,4 @@
-package com.cgvsu.triangulation;
+package com.cgvsu.utils;
 
 import com.cgvsu.math.vector.Vector3;
 import com.cgvsu.model.Model;
@@ -43,14 +43,7 @@ public class Normals {
                     edge1.getZ() * edge2.getX() - edge1.getX() * edge2.getZ(),
                     edge1.getX() * edge2.getY() - edge1.getY() * edge2.getX()
             );
-
-            // Нормализуем нормаль (приводим ее к единичной длине)
-            double length = (double) Math.sqrt(normal.getX() * normal.getX() + normal.getY() * normal.getY() + normal.getZ() * normal.getZ());
-            normal.setX(normal.getX()/length);
-            normal.setY(normal.getY()/length);
-            normal.setZ(normal.getZ()/length);
-
-            // Добавляем нормаль в список
+            normal = normal.normalize();
             normals.add(normal);
         }
         return normals;

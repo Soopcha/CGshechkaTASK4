@@ -95,6 +95,6 @@ public class Camera {
 
         Matrix4x4 rotationMatrix = rotationMatrixX.multiply(rotationMatrixY);
 
-        position = multiplyMatrix4ByVector3(rotationMatrix, position);
+        position = multiplyMatrix4ByVector3AndPerspectiveDivide(rotationMatrix, position);
     }
 }

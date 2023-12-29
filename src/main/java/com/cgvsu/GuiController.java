@@ -140,7 +140,6 @@ public class GuiController {
 
             if (getActiveModel() != null) {
                 Model model = getActiveModel();
-                // RenderEngine.render(canvas.getGraphicsContext2D(), camera, mesh, (int) width, (int) height);
                 RenderEngine.render(canvas.getGraphicsContext2D(), cameraManager.getCurrentCamera(), transformedModel.getTransformations().transformModel(model), (int) width, (int) height);
 
             }
@@ -387,8 +386,6 @@ public class GuiController {
             }
             updateTransformations();
 
-//             Model transformedMesh = transformedModel.getTransformations().transformModel(mesh);
-//             RenderEngine.render(canvas.getGraphicsContext2D(), camera, transformedMesh, (int) canvas.getWidth(), (int) canvas.getHeight());
             Model transformedMesh = transformedModel.getTransformations().transformModel(activeModel);
             RenderEngine.render(canvas.getGraphicsContext2D(), cameraManager.getCurrentCamera(), transformedMesh, (int) canvas.getWidth(), (int) canvas.getHeight());
 
@@ -429,7 +426,6 @@ public class GuiController {
 
     public Model getActiveModel() {
         if (activeModelIndex >= 0 && activeModelIndex < models.size()) {
-           // return transformedModel.getTransformations().transformModel(models.get(activeModelIndex));
             return models.get(activeModelIndex);
         } else {
             return null; // Индекс за пределами массива
@@ -446,7 +442,6 @@ public class GuiController {
         if (activeModelIndex >= 0 && activeModelIndex < models.size()) {
             Model activeModel = models.get(activeModelIndex);
          RenderEngine.render(canvas.getGraphicsContext2D(), cameraManager.getCurrentCamera(), transformedModel.getTransformations().transformModel(activeModel), (int) width, (int) height);
-            //RenderEngine.render(canvas.getGraphicsContext2D(), cameraManager.getCurrentCamera(), activeModel, (int) width, (int) height);
         }
     }
 
@@ -490,7 +485,6 @@ public class GuiController {
                 for (String indexStr : indicesString) {
                     verticesToRemove.add(Integer.parseInt(indexStr.trim()));
                 }
-               // RemoveVertices.removeVertices(getActiveModel(), verticesToRemove);
                 RemoveVertices.removeVertices(model, verticesToRemove);
             }
 
@@ -500,7 +494,6 @@ public class GuiController {
                 for (String indexStr : indicesString) {
                     polygonsToRemove.add(Integer.parseInt(indexStr.trim()));
                 }
-                //PolygonRemover.removeSelectedPolygons(getActiveModel(), polygonsToRemove);
                 PolygonRemover.removeSelectedPolygons(model, polygonsToRemove);
             }
 
