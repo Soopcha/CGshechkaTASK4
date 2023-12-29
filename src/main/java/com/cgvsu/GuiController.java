@@ -150,7 +150,6 @@ public class GuiController {
         }
     }
 
-
     @FXML
     private void onOpenModelMenuItemClick() throws IncorrectFileException {
         FileChooser fileChooser = new FileChooser();
