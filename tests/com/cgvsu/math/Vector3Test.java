@@ -111,7 +111,7 @@ public class Vector3Test {
     public void testCrossProduct() {
         Vector3 vector1 = new Vector3(1.0, 0.0, 0.0);
         Vector3 vector2 = new Vector3(0.0, 1.0, 0.0);
-        Vector3 result = vector1.crossProduct(vector2);
+        Vector3 result = vector1.cross(vector2);
         assertEquals(0.0, result.getX(), 0.0001);
         assertEquals(0.0, result.getY(), 0.0001);
         assertEquals(1.0, result.getZ(), 0.0001);

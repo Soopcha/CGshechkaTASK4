@@ -4,7 +4,7 @@ package com.cgvsu.calc_normals;
 import com.cgvsu.model.Model;
 import com.cgvsu.objreader.IncorrectFileException;
 import com.cgvsu.objreader.ObjReader;
-import com.cgvsu.triangulation.Normals;
+import com.cgvsu.utils.Normals;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

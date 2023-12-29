@@ -7,7 +7,7 @@ import com.cgvsu.math.vector.Vector3;
 import javafx.scene.canvas.GraphicsContext;
 import com.cgvsu.model.Model;
 
-import static com.cgvsu.math.matrix.Matrix4x4.multiplyMatrix4ByVector3;
+import static com.cgvsu.math.matrix.Matrix4x4.multiplyMatrix4ByVector3AndPerspectiveDivide;
 import static com.cgvsu.math.matrix.Matrix4x4.rotateScaleTranslate;
 import static com.cgvsu.math.vector.Vector3.vertexToPoint;
 
@@ -33,7 +33,7 @@ public class RenderEngine {
             ArrayList<Vector2> resultPoints = new ArrayList<>();
             for (int vertexInPolygonInd = 0; vertexInPolygonInd < nVerticesInPolygon; ++vertexInPolygonInd) {
                 Vector3 vertex = mesh.vertices.get(mesh.polygons.get(polygonInd).getVertexIndices().get(vertexInPolygonInd));
-                Vector3 transformedVertex = multiplyMatrix4ByVector3(modelViewProjectionMatrix, vertex);
+                Vector3 transformedVertex = multiplyMatrix4ByVector3AndPerspectiveDivide(modelViewProjectionMatrix, vertex);
 
                 Vector2 resultPoint = vertexToPoint(transformedVertex, width, height);
                 resultPoints.add(resultPoint);
