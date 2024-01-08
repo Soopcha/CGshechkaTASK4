@@ -38,14 +38,14 @@ public class RenderEngine {
         for (int polygonInd = 0; polygonInd < nPolygons; ++polygonInd) {
             final int nVerticesInPolygon = mesh.polygons.get(polygonInd).getVertexIndices().size();
 
-            ArrayList<Vector2> resultVectors = new ArrayList<>();
-            for (int vertexInPolygonInd = 0; vertexInPolygonInd < nVerticesInPolygon; ++vertexInPolygonInd) {
-                Vector3 vertex = mesh.vertices.get(mesh.polygons.get(polygonInd).getVertexIndices().get(vertexInPolygonInd));
-                Vector3 transformedVertex = Matrix4x4.multiplyMatrix4ByVector3AndPerspectiveDivide(modelViewProjectionMatrix, vertex);
-
-                Vector2 resultPoint = Vector3.vertexToPoint(transformedVertex, width, height);
-                resultVectors.add(resultPoint);
-            }
+//            ArrayList<Vector2> resultVectors = new ArrayList<>();
+//            for (int vertexInPolygonInd = 0; vertexInPolygonInd < nVerticesInPolygon; ++vertexInPolygonInd) {
+//                Vector3 vertex = mesh.vertices.get(mesh.polygons.get(polygonInd).getVertexIndices().get(vertexInPolygonInd));
+//                Vector3 transformedVertex = Matrix4x4.multiplyMatrix4ByVector3AndPerspectiveDivide(modelViewProjectionMatrix, vertex);
+//
+//                Vector2 resultPoint = Vector3.vertexToPoint(transformedVertex, width, height);
+//                resultVectors.add(resultPoint);
+//            }
 
             ArrayList<Point2d> resultPoints = new ArrayList<>();
             for (int vertexInPolygonInd = 0; vertexInPolygonInd < nVerticesInPolygon; ++vertexInPolygonInd) {
@@ -66,22 +66,22 @@ public class RenderEngine {
                     zBuffer,
                     modelViewProjectionMatrix);
 
-            for (int vertexInPolygonInd = 1; vertexInPolygonInd < nVerticesInPolygon; ++vertexInPolygonInd) {
-                graphicsContext.strokeLine(
-                        resultVectors.get(vertexInPolygonInd - 1).getX(),
-                        resultVectors.get(vertexInPolygonInd - 1).getY(),
-                        resultVectors.get(vertexInPolygonInd).getX(),
-                        resultVectors.get(vertexInPolygonInd).getY());
-            }
+//            for (int vertexInPolygonInd = 1; vertexInPolygonInd < nVerticesInPolygon; ++vertexInPolygonInd) {
+//                graphicsContext.strokeLine(
+//                        resultVectors.get(vertexInPolygonInd - 1).getX(),
+//                        resultVectors.get(vertexInPolygonInd - 1).getY(),
+//                        resultVectors.get(vertexInPolygonInd).getX(),
+//                        resultVectors.get(vertexInPolygonInd).getY());
+//            }
 
 
 
-            if (nVerticesInPolygon > 0)
-                graphicsContext.strokeLine(
-                        resultVectors.get(nVerticesInPolygon - 1).getX(),
-                        resultVectors.get(nVerticesInPolygon - 1).getY(),
-                        resultVectors.get(0).getX(),
-                        resultVectors.get(0).getY());
+//            if (nVerticesInPolygon > 0)
+//                graphicsContext.strokeLine(
+//                        resultVectors.get(nVerticesInPolygon - 1).getX(),
+//                        resultVectors.get(nVerticesInPolygon - 1).getY(),
+//                        resultVectors.get(0).getX(),
+//                        resultVectors.get(0).getY());
         }
     }
     public static Point2d vertexToPoint(final Vector3 vertex, final int width, final int height) {
@@ -164,7 +164,7 @@ public class RenderEngine {
                     int pixelX = (int) x;
                     int pixelY = (int) y;
 
-                    if (InterpolatedDepth < zBuffer[pixelX][pixelY]) {
+                    if (InterpolatedDepth <= zBuffer[pixelX][pixelY]) {
                         zBuffer[pixelX][pixelY] = (double) InterpolatedDepth;
 
                         // Заливка цветом или применение затенения
